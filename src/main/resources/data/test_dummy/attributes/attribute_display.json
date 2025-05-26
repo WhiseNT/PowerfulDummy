@@ -1,0 +1,15 @@
+{
+  "attributes": [
+    {
+      "key": "minecraft:generic.armor",
+      "usePercent": false,
+      "displayColor": "0x2e2e2e",
+      "valueColor": "0x2e2e2e"
+    },
+    {
+      "key": "minecraft:generic.armor_toughness",
+      "usePercent": false
+    }
+
+  ]
+}

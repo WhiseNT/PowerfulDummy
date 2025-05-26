@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.whisent.test_dummy.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "test_dummy.refmap.json",
+  "mixins": [
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

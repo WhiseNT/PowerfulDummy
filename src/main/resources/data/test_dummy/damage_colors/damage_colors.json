@@ -1,0 +1,12 @@
+{
+  "types": [
+    {
+      "damageName": "minecraft:fire",
+      "displayColor": "0xff6f31"
+    },
+    {
+      "damageName": "minecraft:indirect_magic",
+      "displayColor": "0xce31ff"
+    }
+  ]
+}
