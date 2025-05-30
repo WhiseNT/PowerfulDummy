@@ -24,6 +24,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.extensions.IForgeMenuType;
@@ -40,6 +41,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -87,13 +89,15 @@ public class Test_dummy {
                     .build());
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> {
-            EntityRenderers
-                    .register(DummyEntityRegistry.TEST_DUMMY.get(), TestDummyRenderer::new);
-        });
-        event.enqueueWork(() -> {
-            NetWorkHandler.register();
-        });
+        if (FMLLoader.getDist().isClient()) {
+            event.enqueueWork(() -> {
+                EntityRenderers
+                        .register(DummyEntityRegistry.TEST_DUMMY.get(), TestDummyRenderer::new);
+
+            });
+            event.enqueueWork(NetWorkHandler::register);
+        }
+
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
@@ -104,6 +108,7 @@ public class Test_dummy {
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
+    @OnlyIn(Dist.CLIENT)
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents {
 

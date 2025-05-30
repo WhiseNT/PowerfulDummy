@@ -22,12 +22,12 @@ public class DamageTagData {
 
         public int getDisplayColor() {
             if (displayColor == null || displayColor.isEmpty()) {
-                return 0x2e2e2e; // 默认灰色
+                return 0xffffff;
             }
             try {
                 return Integer.decode(displayColor);
             } catch (NumberFormatException e) {
-                return 0x2e2e2e;
+                return 0xffffff;
             }
         }
     }

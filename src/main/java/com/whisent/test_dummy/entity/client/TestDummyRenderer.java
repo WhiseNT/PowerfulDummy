@@ -6,7 +6,10 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
+@OnlyIn(Dist.CLIENT)
 public class TestDummyRenderer extends MobRenderer<TestDummyEntity, TestDummyModel<TestDummyEntity>> {
     public TestDummyRenderer(EntityRendererProvider.Context context) {
         super(context, new TestDummyModel<>(context.bakeLayer(TestDummyModel.LAYER_LOCATION)), 0.5f);

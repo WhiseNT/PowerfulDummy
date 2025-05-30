@@ -27,7 +27,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ToolActions;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.network.NetworkHooks;
+import top.theillusivec4.curios.api.CuriosCapability;
 
 public class TestDummyEntity extends Mob {
     public MobType type;
@@ -60,6 +62,7 @@ public class TestDummyEntity extends Mob {
             if (!player.isCreative()){
                 Block.popResource(player.level(),this.blockPosition(), new ItemStack(ItemRegistry.DUMMY_STAND.get()));
             }
+            this.popEquipmentSlots();
             this.kill();
             this.level().playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.ARMOR_STAND_BREAK, this.getSoundSource(), 1.0F, 1.0F);;
             this.showBreakingParticles();
@@ -79,7 +82,25 @@ public class TestDummyEntity extends Mob {
         }
         return super.interactAt(player, pos, hand);
     }
+    public void popEquipmentSlots () {
+        this.getAllSlots().forEach(itemStack -> {
+             if (!itemStack.isEmpty()) {
+                Block.popResource(this.level(),this.blockPosition(), itemStack);
+            }
+        });
+        if (ModList.get().isLoaded( "curios")) {
+            int amount = this.getCapability(CuriosCapability.INVENTORY).resolve().get()
+                    .getEquippedCurios().getSlots();
+            for (int i = 0; i < amount; i++) {
+                ItemStack itemStack = this.getCapability(CuriosCapability.INVENTORY).resolve().get()
+                        .getEquippedCurios().getStackInSlot(i);
+                if (!itemStack.isEmpty()) {
+                    Block.popResource(this.level(),this.blockPosition(),itemStack);
+                }
+            }
 
+        }
+    }
     @Override
     public boolean isInvulnerableTo(DamageSource source) {
         return source == this.damageSources().drown() ||
@@ -92,6 +113,7 @@ public class TestDummyEntity extends Mob {
 
     @Override
     public boolean hurt(DamageSource source, float damage) {
+        this.heal(damage);
         return super.hurt(source, damage);
     }
 

@@ -91,74 +91,72 @@ public class TestDummyEntityMenu extends AbstractContainerMenu {
     }
     @Override
     public @NotNull ItemStack quickMoveStack(Player player, int index) {
-        //盔甲栏→玩家物品栏
-        if (index < 6) {
-            Slot slot = this.slots.get(index);
-            if (slot.hasItem()) {
-                ItemStack itemStack = slot.getItem();
-                for (int i = 6; i < 42; i++) {
-                    if (!this.slots.get(i).hasItem()) {
-                        System.out.println("发现空位");
-                        Slot toSlot = this.slots.get(i);
-                        toSlot.set(itemStack);
-                        slot.set(ItemStack.EMPTY);
-                        slot.setChanged();
-                        toSlot.setChanged();
-                        return itemStack;
+        ItemStack originalStack = ItemStack.EMPTY;
+        Slot slot = this.slots.get(index);
+
+        if (slot != null && slot.hasItem()) {
+            ItemStack itemStack = slot.getItem();
+            originalStack = itemStack.copy();
+
+            // 1. 从盔甲栏/手持栏转移 (0-5)
+            if (index < 6) {
+                // 先尝试饰品栏 (42+)
+                if (!moveItemStackTo(itemStack, 42, slots.size(), false)) {
+                    // 再尝试玩家背包 (6-42)
+                    if (!moveItemStackTo(itemStack, 6, 42, false)) {
+                        return ItemStack.EMPTY;
                     }
                 }
             }
-        } else if (index<42) {
-            Slot slot = this.slots.get(index);
-            if (slot.hasItem()) {
-                ItemStack itemStack = slot.getItem();
-                for (int i = 0; i < 6; i++) {
-                    if (!this.slots.get(i).hasItem()) {
-                        if (itemStack.getItem() instanceof ArmorItem armorItem && armorItem.getEquipmentSlot() == getEquipmentSlot(i)) {
-                            moveItemStackTo(itemStack,i,index,false);
-                            slot.setChanged();
-                        }
-                        if (i > 3) {
-                            moveItemStackTo(itemStack,i,index,false);
-                            slot.setChanged();
+            // 2. 从玩家背包转移 (6-41)
+            else if (index < 42) {
+                // 优先级1: 饰品栏 (42+)
+                if (!moveItemStackTo(itemStack, 42, slots.size(), false)) {
+                    // 优先级2: 匹配的盔甲栏 (0-3)
+                    boolean movedToArmor = false;
+                    if (itemStack.getItem() instanceof ArmorItem armorItem) {
+                        for (int i = 0; i < 4; i++) {
+                            if (armorItem.getEquipmentSlot() == getEquipmentSlot(i)) {
+                                if (moveItemStackTo(itemStack, i, i+1, false)) {
+                                    movedToArmor = true;
+                                    break;
+                                }
+                            }
                         }
                     }
-                }
-                for (int i = 42;i < this.slots.size(); ++i) {
-                    if (!this.slots.get(i).hasItem()) {
-                        if (this.slots.get(i).mayPlace(itemStack)) {
-                            this.slots.get(i).set(itemStack);
-                            this.slots.get(index).set(ItemStack.EMPTY);
-                            this.slots.get(i).setChanged();
-                            //moveItemStackTo(itemStack,i,index,false);
-                            slot.setChanged();
-                            break;
+                    // 优先级3: 手持栏 (4-5) - 最低优先级
+                    if (!movedToArmor && !itemStack.isEmpty()) {
+                        if (!moveItemStackTo(itemStack, 4, 6, false)) {
+                            return ItemStack.EMPTY;
                         }
                     }
                 }
             }
-        } else {
-            if (ModList.get().isLoaded("curios")) {
-                TestDummyCurioSlot curioSlot = (TestDummyCurioSlot) this.slots.get(index);
-                System.out.println(curioSlot.getItem());
-                if (!curioSlot.hasItem()) {
+            // 3. 从饰品栏转移 (42+)
+            else {
+                // 直接尝试玩家背包 (6-42)
+                if (!moveItemStackTo(itemStack, 6, 42, false)) {
                     return ItemStack.EMPTY;
                 }
-                ItemStack itemStack = curioSlot.getItem();
-                for (int i = 6; i < 42; i++) {
-                    Slot toSlot = this.slots.get(i);
-                    if (!toSlot.hasItem()) {
-                        moveItemStackTo(itemStack, i, index, false);
-                        curioSlot.setChanged();
-                        toSlot.setChanged();
-                        return itemStack;
-                    }
-                }
+            }
+
+            if (itemStack.isEmpty()) {
+                slot.set(ItemStack.EMPTY);
+            } else {
+                slot.setChanged();
+            }
+
+            if (itemStack.getCount() == originalStack.getCount()) {
                 return ItemStack.EMPTY;
             }
+
+            slot.onTake(player, itemStack);
         }
-        return ItemStack.EMPTY;
+
+        return originalStack;
     }
+
+
 
     @Override
     public boolean stillValid(Player playerIn) {
@@ -200,15 +198,22 @@ public class TestDummyEntityMenu extends AbstractContainerMenu {
         int slotIndex = 0;
         int startX = -5;
         int startY = 8;
+        for (int i = 0; i < curiosContainer.getCuriosHandlerRaw().getSlots(); i++) {
+            String identifier = curiosContainer.getIdentifier(i);
+            ICurioStacksHandler handler =
+                    curiosContainer.getCuriosHandlerRaw().getCurios().get(identifier);
+            int amount = handler.getSlots();
+            if (!handler.isVisible()) continue;
+            for (int j = 0; j < amount; j++) {
+                this.addSlot(new TestDummyCurioSlot(curiosContainer,slotIndex,startX,startY,identifier,entity));
+                ;
+            }
+            slotIndex++;
+            startY += 18; // 下一行
+        }
         for (var entry : curiosContainer.getCuriosHandlerRaw().getCurios().entrySet()) {
             String identifier = entry.getKey();
-            ICurioStacksHandler handler = entry.getValue();
-            if (!handler.isVisible()) continue;
-            for (int i = 0; i < handler.getSlots(); i++) {
-                this.addSlot(new TestDummyCurioSlot(curiosContainer,slotIndex,startX,startY,identifier,entity));
-                slotIndex++;
-            }
-            startY += 18; // 下一行
+
         }
     }
     public TestDummyCuriosContainer getCuriosContainer() {

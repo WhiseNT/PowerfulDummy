@@ -27,28 +27,35 @@ public class TestDummyCurioSlot extends Slot {
 
     @Override
     public boolean mayPlace(ItemStack itemStack) {
-        TestDummyCuriosContainer curiosContainer = (TestDummyCuriosContainer) container;
-        //能否装入空物品槽
-        boolean flag = curiosContainer.getCuriosHandlerRaw().getCurios().get(identifier).getStacks().insertItem(
-                curiosContainer.getIdentifierIndex(identifier,slotIndex), itemStack, true
-        ).isEmpty();
-        //能否转换物品
-        boolean flag2 = curiosContainer.getCuriosHandlerRaw().getCurios().get(identifier).getStacks().insertItem(
-                curiosContainer.getIdentifierIndex(identifier,slotIndex), itemStack, true
-        ).equals(itemStack);
-        if (this.hasItem()) {
-            if (flag2) {
-                return true;
+        if (true) {
+            TestDummyCuriosContainer curiosContainer = (TestDummyCuriosContainer) container;
+
+            //能否装入空物品槽
+            boolean flag = curiosContainer.getCuriosHandlerRaw().getCurios().get(identifier).getStacks().insertItem(
+                    curiosContainer.getIdentifierIndex(identifier,slotIndex), itemStack, true
+            ).isEmpty();
+            //能否转换物品
+            boolean flag2 = curiosContainer.getCuriosHandlerRaw().getCurios().get(identifier).getStacks().insertItem(
+                    curiosContainer.getIdentifierIndex(identifier,slotIndex), itemStack, true
+            ).equals(itemStack);
+
+            System.out.println("能否放入"+identifier);
+            System.out.println("能否放入"+flag2);
+            if (this.hasItem()) {
+                if (flag2) {
+                    return true;
+                } else {
+                    return false;
+                }
             } else {
-                return false;
-            }
-        } else {
-            if (flag) {
-                return true;
-            } else {
-                return false;
+                if (flag) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
+        return false;
 
 
     }

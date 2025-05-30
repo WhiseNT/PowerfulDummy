@@ -3,6 +3,7 @@ package com.whisent.test_dummy.gui.widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.whisent.test_dummy.Test_dummy;
 import com.whisent.test_dummy.entity.TestDummyEntity;
+import com.whisent.test_dummy.utils.EditBoxInfoHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -45,7 +46,8 @@ public class AttributeAutoCompleteEditBox extends AbstractAutoCompleteEditBox {
     public void loadSuggestions() {
         //Test_dummy.LOGGER.debug(this.entity.toString());
         if (getEntity().isAlive()) {
-
+            suggestions.clear();
+            attributesNotZero.clear();
             RegistryAccess registryAccess = Minecraft.getInstance().level.registryAccess();
             Registry<Attribute> attributeRegistry = registryAccess.registryOrThrow(Registries.ATTRIBUTE);
             for (ResourceLocation key : attributeRegistry.keySet()) {
@@ -65,7 +67,7 @@ public class AttributeAutoCompleteEditBox extends AbstractAutoCompleteEditBox {
     }
     @Override
     protected void drawSuggestions(GuiGraphics guiGraphics, List<String> list, int mouseX, int mouseY) {
-
+        this.loadSuggestions();
         int x = this.getX();
         int y = this.getY() + this.getHeight();
         int width = this.getWidth();
@@ -80,8 +82,10 @@ public class AttributeAutoCompleteEditBox extends AbstractAutoCompleteEditBox {
                 guiGraphics.fill(x, y + i * 12, x + width, y + (i + 1) * 12, 0xB0555555);
             }
             String finalSuggestion = suggestion;
-            if (suggestion.length() >= 6) {
-                finalSuggestion = suggestion.substring(0, 6) + "..";
+            if (suggestion.length() >= 7 && Minecraft.getInstance().getLanguageManager().getSelected().equals("zh_cn")) {
+                finalSuggestion = suggestion.substring(0, 7) + "..";
+            } else if (suggestion.length() >= 11) {
+                finalSuggestion = suggestion.substring(0, 11) + "..";
             }
             if (attributesNotZero.getOrDefault(suggestion,false)) {
                 guiGraphics.drawString(Minecraft.getInstance().font, finalSuggestion, x + 4, y + i * 12 + 2, 0xfca800);

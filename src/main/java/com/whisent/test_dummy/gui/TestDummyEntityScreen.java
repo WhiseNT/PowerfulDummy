@@ -143,13 +143,13 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
         int col = 0;
         int index = 0;
 
-        for (var entry : handler.getCurios().entrySet()) {
-            String identifier = entry.getKey();
-            int identifierIndex =  this.menu.getCuriosContainer().getIdentifierIndex(identifier,index);
-            ItemStack item = handler.getCurios().get(identifier).getStacks().getStackInSlot(identifierIndex);
+        for (int i = 0; i < handler.getSlots(); i++) {
+            String identifier = this.menu.getCuriosContainer().getIdentifier(i);
+
+            //int identifierIndex =  this.menu.getCuriosContainer().getIdentifierIndex(identifier,index);
+
+            ItemStack item = handler.getEquippedCurios().getStackInSlot(index);
             ResourceLocation icon = CuriosApi.getSlot(identifier).get().getIcon();
-
-
             ResourceLocation newIcon = new ResourceLocation(icon.getNamespace(), "textures/"+icon.getPath()+".png");
             RenderSystem.setShaderTexture(0, newIcon);
             RenderSystem.setShaderTexture(0, CURIOS_TEX);
@@ -163,7 +163,9 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
             }
             row++;
             index++;
+
         }
+
 
 
     }

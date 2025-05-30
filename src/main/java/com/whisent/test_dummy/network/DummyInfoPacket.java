@@ -4,6 +4,7 @@ import com.whisent.test_dummy.Test_dummy;
 import com.whisent.test_dummy.entity.TestDummyEntity;
 import com.whisent.test_dummy.utils.MobTypeHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -11,6 +12,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -42,6 +45,7 @@ public class DummyInfoPacket {
             if (contextSupplier.get().getDirection().getReceptionSide().isServer()) {
                 ServerPlayer player = contextSupplier.get().getSender();
                 if (player == null) return;
+
                 Level world = player.level();
                 Entity entity = world.getEntity(this.id);
                 if (entity != null && entity instanceof TestDummyEntity testDummy && !testDummy.isRemoved()) {

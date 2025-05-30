@@ -30,7 +30,6 @@ public class DummyEventUtils {
         float dps = DpsTracker.getDps(player);
         if (dps > 0.0f) {
             DpsData data = DpsTracker.getDpsData(player);
-            System.out.println(data.getDamageSource());
             int color = DamageTagLoader.findDisplayColor(data.getDamageSource());
             float damage = data.getLastDamage();
             float total = data.getTotalDamage();
@@ -39,9 +38,9 @@ public class DummyEventUtils {
             MutableComponent damageCountComponent = Component.literal(String.format("%.1f", damage))
                     .withStyle(style -> style.withColor(color));
 
-            MutableComponent dpsComponent = Component.translatable("chat.test_dummy.dps" + String.format("%.1f", dps))
+            MutableComponent dpsComponent = Component.translatable("chat.test_dummy.dps").append(String.format("%.1f", dps))
                     .withStyle(style -> style.withColor(ChatFormatting.WHITE));
-            MutableComponent totalComponent = Component.translatable("chat.test_dummy.total_damage" + String.format("%.1f", total))
+            MutableComponent totalComponent = Component.translatable("chat.test_dummy.total_damage").append(String.format("%.1f", total))
                     .withStyle(style -> style.withColor(ChatFormatting.WHITE));
 
             MutableComponent finalText = damageComponent.append(damageCountComponent)

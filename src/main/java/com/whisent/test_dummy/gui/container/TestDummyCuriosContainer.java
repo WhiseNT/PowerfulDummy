@@ -29,16 +29,22 @@ public class TestDummyCuriosContainer extends SimpleContainer {
     private void init () {
         int index = 0;
         for (var entry : curiosItemHandler.getCurios().values()) {
-            identifierList.add(entry.getIdentifier());
-            identifierMap.putIfAbsent(entry.getIdentifier(), new ArrayList<>());
-            identifierMap.get(entry.getIdentifier()).add(index);
-            index++;
+            int identifierAmount = curiosItemHandler.getCurios().get(entry.getIdentifier()).getSlots();
+            for (int i = 0; i < identifierAmount; i++) {
+                identifierList.add(entry.getIdentifier());
+                identifierMap.putIfAbsent(entry.getIdentifier(), new ArrayList<>());
+                identifierMap.get(entry.getIdentifier()).add(index);
+                index++;
+            }
+
         }
+        //System.out.println(identifierMap);
         var inv = entity.getCapability(CuriosCapability.INVENTORY).resolve();
-        for (int i = 0; i < entity.getCapability(CuriosCapability.INVENTORY).resolve().get().getSlots(); i++) {
+        for (int i = 0; i < this.curiosItemHandler.getCurios().size(); i++) {
             String identifier = identifierList.get(i);
-            setItem(i,inv.get().getCurios().get(identifier)
-                    .getStacks().getStackInSlot(getIdentifierIndex(identifier,i)) );
+            setItem(i,inv.get().getCurios().get(identifier).getStacks()
+                    .getStackInSlot(getIdentifierIndex(identifier,i)));
+
         }
 
     }
@@ -46,6 +52,20 @@ public class TestDummyCuriosContainer extends SimpleContainer {
     public void setItem(int index, ItemStack itemStack) {
         super.setItem(index, itemStack);
         String itemIdentifier = identifierList.get(index);
+        //System.out.println(itemStack);
+        if (!itemStack.isEmpty()) {
+            if (curiosItemHandler.getCurios().get(itemIdentifier).getStacks()
+                    .getStackInSlot(getIdentifierIndex(itemIdentifier,index)).isEmpty()) {
+                curiosItemHandler.getCurios().get(itemIdentifier).getStacks()
+                        .insertItem(getIdentifierIndex(itemIdentifier,index),itemStack,false);
+            }
+
+            }else {
+            curiosItemHandler.getCurios().get(itemIdentifier).getStacks()
+                    .insertItem(getIdentifierIndex(itemIdentifier,index),ItemStack.EMPTY,false);
+        }
+
+        /*
         if (!itemStack.isEmpty()) {
             curiosItemHandler.getCurios().values().stream().filter(i -> i.getIdentifier().equals(itemIdentifier)).findFirst().ifPresent(i -> {
                 if (i.getStacks().getStackInSlot(getIdentifierIndex(i.getIdentifier(),index)).isEmpty()) {
@@ -57,6 +77,7 @@ public class TestDummyCuriosContainer extends SimpleContainer {
                 i.getStacks().insertItem(getIdentifierIndex(i.getIdentifier(),index), ItemStack.EMPTY,false);
             });
         }
+         */
 
     }
     @Override

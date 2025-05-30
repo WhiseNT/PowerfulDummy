@@ -1,5 +1,9 @@
 {
-  "button.test_dummy.undefined": "Undefined",
+  "item.test_dummy.dummy_stand": "Dummy Stand",
+
+  "entity.test_dummy.test_dummy": "Test Dummy",
+  "creativetab.test_dummy": "Test Dummy Tab",
+  "button.test_dummy.undefined": "Default",
   "button.test_dummy.undead": "Undead",
   "button.test_dummy.arthropod": "Arthropod",
   "button.test_dummy.illager": "Illager",
@@ -12,7 +16,7 @@
   "button.test_dummy.change_mod_tip": "ModeChange",
   "button.test_dummy.change_mode": "CHANGE",
 
-  "chat.test_dummy.damage": "Damage: ",
-  "chat.test_dummy.dps": "DPS: ",
-  "chat.test_dummy.total_damage": "Total: "
+  "chat.test_dummy.damage": "Last Damage: ",
+  "chat.test_dummy.dps": " DPS: ",
+  "chat.test_dummy.total_damage": " Total: "
 }

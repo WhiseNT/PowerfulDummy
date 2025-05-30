@@ -20,7 +20,7 @@ public class AttributeLoader extends SimpleJsonResourceReloadListener {
     public static Map<ResourceLocation, AttributeData> configs = new HashMap<>();
 
     public AttributeLoader() {
-        super(GSON, "attributes");
+        super(GSON, "dummy_attributes");
     }
 
     @Override
