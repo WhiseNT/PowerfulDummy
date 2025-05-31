@@ -1,0 +1,22 @@
+{
+  "item.powerful_dummy.dummy_stand": "Dummy Stand",
+
+  "entity.powerful_dummy.test_dummy": "Test Dummy",
+  "creativetab.powerful_dummy": "Powerful Dummy Tab",
+  "button.powerful_dummy.undefined": "Default",
+  "button.powerful_dummy.undead": "Undead",
+  "button.powerful_dummy.arthropod": "Arthropod",
+  "button.powerful_dummy.illager": "Illager",
+  "button.powerful_dummy.water": "Water",
+
+  "button.powerful_dummy.attribute": "Attribute",
+  "button.powerful_dummy.value": "Value",
+  "button.powerful_dummy.apply": "Apply",
+  "button.powerful_dummy.mobType": "MobType",
+  "button.powerful_dummy.change_mod_tip": "ModeChange",
+  "button.powerful_dummy.change_mode": "CHANGE",
+
+  "chat.powerful_dummy.damage": "Last Damage: ",
+  "chat.powerful_dummy.dps": " DPS: ",
+  "chat.powerful_dummy.total_damage": " Total: "
+}
