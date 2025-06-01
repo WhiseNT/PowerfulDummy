@@ -152,6 +152,9 @@ repositories {
         name = "Curios"
         url = uri("https://maven.theillusivec4.top/")
     }
+    maven {
+        url "https://cursemaven.com"
+    }
     // If you have mod jar dependencies in ./libs, you can declare them as a repository like so.
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:flat_dir_resolver
     // flatDir {
@@ -171,6 +174,7 @@ dependencies {
     //implementation fg.deobf("dev.latvian.mods:rhino-forge:${rhino_version}")
     //implementation fg.deobf("dev.architectury:architectury-forge:${architectury_version}")
     compileOnly "top.theillusivec4.curios:curios-forge:${curios_version}:api"
+    //implementation fg.deobf("curse.maven:slashblade-241596:4937125")
     //runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime

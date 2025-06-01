@@ -17,6 +17,9 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
@@ -26,9 +29,10 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.network.NetworkHooks;
+import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CuriosCapability;
 
-public class TestDummyEntity extends Mob {
+public class TestDummyEntity extends Monster {
     public MobType type;
 
     private final SimpleContainer inventory = new SimpleContainer(4);
@@ -77,6 +81,7 @@ public class TestDummyEntity extends Mob {
                 }
             }
         }
+
         return super.interactAt(player, pos, hand);
     }
     public void popEquipmentSlots () {
@@ -100,8 +105,7 @@ public class TestDummyEntity extends Mob {
     }
     @Override
     public boolean isInvulnerableTo(DamageSource source) {
-        return source == this.damageSources().drown() ||
-                source == this.damageSources().inWall();
+        return super.isInvulnerableTo(source);
     }
     @Override
     public boolean isPushable() {
@@ -110,7 +114,9 @@ public class TestDummyEntity extends Mob {
 
     @Override
     public boolean hurt(DamageSource source, float damage) {
-        this.heal(damage);
+        //this.heal(damage);
+        //System.out.println("收到伤害");
+
         return super.hurt(source, damage);
     }
 
@@ -165,5 +171,10 @@ public class TestDummyEntity extends Mob {
     @Override
     public void setYRot(float p_146923_) {
         super.setYRot(p_146923_);
+    }
+
+    @Override
+    public @Nullable LivingEntity getLastHurtByMob() {
+        return super.getLastHurtByMob();
     }
 }

@@ -97,6 +97,7 @@ public class Powerful_dummy {
 
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
+
             MenuScreens.register(MenuRegistry.TEST_DUMMY_MENU.get(), TestDummyEntityScreen::new);
 
         }

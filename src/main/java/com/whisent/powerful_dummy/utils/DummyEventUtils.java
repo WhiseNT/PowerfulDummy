@@ -27,7 +27,7 @@ public class DummyEventUtils {
             int color = DamageTagLoader.findDisplayColor(data.getDamageSource());
             float damage = data.getLastDamage();
             float total = data.getTotalDamage();
-            MutableComponent damageComponent = Component.translatable("chat.test_dummy.damage")
+            MutableComponent damageComponent = Component.translatable("chat.powerful_dummy.damage")
                     .withStyle(style -> style.withColor(ChatFormatting.WHITE));
             MutableComponent damageCountComponent = Component.literal(String.format("%.1f", damage))
                     .withStyle(style -> style.withColor(color));

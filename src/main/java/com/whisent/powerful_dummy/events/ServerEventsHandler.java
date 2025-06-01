@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -19,6 +20,7 @@ public class ServerEventsHandler {
     public static void onDamageEvent(LivingDamageEvent event) {
         Entity entity = event.getEntity();
         if (!entity.level().isClientSide() && entity instanceof TestDummyEntity) {
+            System.out.println("hurt");
             double damage = event.getAmount();
             Entity source = event.getSource().getEntity();
             if (source instanceof Player) {
@@ -26,6 +28,11 @@ public class ServerEventsHandler {
                 DummyEventUtils.sendHurtMessage((ServerPlayer) source);;
             }
         }
+    }
+    @SubscribeEvent
+    public static void onAttackEvent(LivingAttackEvent event) {
+        Entity entity = event.getEntity();
+        System.out.println("触发攻击");
     }
     @SubscribeEvent
     public static void onHurtEvent(LivingHurtEvent event) {
