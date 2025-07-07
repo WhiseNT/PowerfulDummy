@@ -186,6 +186,10 @@ public class TestDummyEntityMenu extends AbstractContainerMenu {
         int startX = -5;
         int startY = 8;
         for (int i = 0; i < curiosContainer.getCuriosHandlerRaw().getSlots(); i++) {
+            if (i != 0 && i % 10 == 0) {
+                startX -= 18;
+                startY = 8;
+            }
             String identifier = curiosContainer.getIdentifier(i);
             ICurioStacksHandler handler =
                     curiosContainer.getCuriosHandlerRaw().getCurios().get(identifier);
@@ -196,7 +200,7 @@ public class TestDummyEntityMenu extends AbstractContainerMenu {
                 ;
             }
             slotIndex++;
-            startY += 18; // 下一行
+            startY += 18;
         }
         for (var entry : curiosContainer.getCuriosHandlerRaw().getCurios().entrySet()) {
             String identifier = entry.getKey();

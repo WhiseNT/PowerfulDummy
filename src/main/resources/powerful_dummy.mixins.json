@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "powerful_dummy.refmap.json",
   "mixins": [
+    "ServerPlayerMixin"
   ],
   "client": [
   ],

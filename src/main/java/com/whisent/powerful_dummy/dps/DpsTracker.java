@@ -3,6 +3,7 @@ package com.whisent.powerful_dummy.dps;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.event.level.NoteBlockEvent;
 
 import java.util.Map;
 import java.util.UUID;
@@ -17,6 +18,11 @@ public class DpsTracker {
             DpsData data = ENTITY_DPS_MAP.computeIfAbsent(playerId, id -> new DpsData());
             data.addDamage(damage,damageSource);
         }
+    }
+    public static void onEntityDamage(DamageSource damageSource,Player player, double damage) {
+        UUID playerId = player.getUUID();
+        DpsData data = ENTITY_DPS_MAP.computeIfAbsent(playerId, id -> new DpsData());
+        data.addDamage(damage,damageSource);
     }
 
     public static float getDps(Entity entity) {

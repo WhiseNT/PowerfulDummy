@@ -1,6 +1,8 @@
 package com.whisent.powerful_dummy;
 
 import com.mojang.logging.LogUtils;
+import com.whisent.powerful_dummy.client.DpsActionBar;
+import com.whisent.powerful_dummy.client.KeyHandler;
 import com.whisent.powerful_dummy.entity.DummyEntityRegistry;
 import com.whisent.powerful_dummy.entity.TestDummyEntity;
 import com.whisent.powerful_dummy.entity.client.TestDummyModel;
@@ -57,6 +59,8 @@ public class Powerful_dummy {
         modEventBus.addListener(EventPriority.NORMAL, false, EntityAttributeCreationEvent.class, event -> {
             event.put(DummyEntityRegistry.TEST_DUMMY.get(), TestDummyEntity.setAttributes());
         });
+        new DpsActionBar();
+        KeyHandler.init();
         //ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
     }

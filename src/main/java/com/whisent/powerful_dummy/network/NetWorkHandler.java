@@ -14,6 +14,12 @@ public class NetWorkHandler {
             .clientAcceptedVersions((version) -> true)
             .networkProtocolVersion(() -> PROTOCOL_VERSION)
             .simpleChannel();
+    public static final SimpleChannel CHANNEL_DPS = NetworkRegistry.ChannelBuilder.named(
+            new ResourceLocation(Powerful_dummy.MODID,"dps"))
+            .serverAcceptedVersions((version) -> true)
+            .clientAcceptedVersions((version) -> true)
+            .networkProtocolVersion(() -> PROTOCOL_VERSION)
+            .simpleChannel();
 
     public static void register() {
         int id = 0;
@@ -21,6 +27,11 @@ public class NetWorkHandler {
                 .encoder(DummyInfoPacket::encode)
                 .decoder(DummyInfoPacket::decode)
                 .consumerMainThread(DummyInfoPacket::handle)
+                .add();
+        CHANNEL.messageBuilder(DpsComponentPacket.class, id+1)
+                .encoder(DpsComponentPacket::encode)
+                .decoder(DpsComponentPacket::decode)
+                .consumerMainThread(DpsComponentPacket::handle)
                 .add();
 
     }

@@ -61,10 +61,16 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
         int y = (this.height - this.imageHeight) / 2;
         guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
         if (ModList.get().isLoaded("curios")) {
-            guiGraphics.blit(CURIOS_TEX, this.leftPos - 13, this.topPos,0,
-                    0, 0,
-                    30, 200,
-                    200, 200);
+            ICuriosItemHandler handler = this.menu.getTargetEntity().getCapability(CuriosCapability.INVENTORY).resolve().orElse(null);
+            if (handler == null) return;
+            int number = handler.getSlots() / 9;
+            for (int j = 0; j < number + 1; j++) {
+                guiGraphics.blit(CURIOS_TEX, this.leftPos - 13 - j * 18, this.topPos,0,
+                        0, 0,
+                        30, 200,
+                        200, 200);
+            }
+
         }
         armorRender(guiGraphics);
         curiosRender(guiGraphics);
@@ -142,6 +148,10 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
         int index = 0;
 
         for (int i = 0; i < handler.getSlots(); i++) {
+            if (i != 0 && i % 10 == 0) {
+                col += 1;
+                row = 0;
+            }
             String identifier = this.menu.getCuriosContainer().getIdentifier(i);
 
             //int identifierIndex =  this.menu.getCuriosContainer().getIdentifierIndex(identifier,index);
@@ -151,10 +161,11 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
             ResourceLocation newIcon = new ResourceLocation(icon.getNamespace(), "textures/"+icon.getPath()+".png");
             RenderSystem.setShaderTexture(0, newIcon);
             RenderSystem.setShaderTexture(0, CURIOS_TEX);
+            int x = startX - col * slotSize;
             int y = startY + row * (slotSize + gap);
-            guiGraphics.blit(CURIOS_TEX, startX,y,0,32, 0, 18, 18,200,200);
+            guiGraphics.blit(CURIOS_TEX, x,y,0,32, 0, 18, 18,200,200);
             if (item.isEmpty()) {
-                guiGraphics.blit(newIcon, startX, y,
+                guiGraphics.blit(newIcon, x, y,
                         0, 0,
                         18, 18,
                         18, 18);
@@ -300,9 +311,8 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
         addRenderableWidget(changeTypeButton);
         this.applyAttributeButton = new CustomFocusButton.Builder(
                         Component.translatable("button.powerful_dummy.apply"),
-                        button -> {
-                            sendData();
-                        },attributeAutoCompleteBox)
+                        button -> sendData()
+                        ,attributeAutoCompleteBox)
                 .pos(Xpos,this.topPos + 93 )
                 .size(73, 16)
                 .build();
@@ -391,12 +401,14 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
         return super.mouseScrolled(mouseX, mouseY, delta);
     }
     private void sendData () {
-        NetWorkHandler.sendToServer(new DummyInfoPacket(
+
+        NetWorkHandler.CHANNEL.sendToServer(new DummyInfoPacket(
                 this.menu.getTargetEntity().getId(),
                 MobTypeHelper.toId(this.mobType),
                 attributesMap
         ));
     }
+
 }
 
 

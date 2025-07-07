@@ -1,7 +1,9 @@
 package com.whisent.powerful_dummy.entity;
 
+import com.whisent.powerful_dummy.dps.DpsTracker;
 import com.whisent.powerful_dummy.gui.TestDummyEntityMenu;
 import com.whisent.powerful_dummy.item.ItemRegistry;
+import com.whisent.powerful_dummy.utils.DummyEventUtils;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -32,8 +34,9 @@ import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CuriosCapability;
 
-public class TestDummyEntity extends Monster {
-    public MobType type;
+public class TestDummyEntity extends Mob {
+    public MobType mobType;
+    public Player lastInteractPlayer;
 
     private final SimpleContainer inventory = new SimpleContainer(4);
     public TestDummyEntity(EntityType<? extends TestDummyEntity> entityType, Level level) {
@@ -41,14 +44,14 @@ public class TestDummyEntity extends Monster {
         this.setNoAi(false);
         this.xpReward = 0;
         this.setCanPickUpLoot(false);
-        this.setInvulnerable(true);
-        this.type = MobType.UNDEFINED;
+        this.setInvulnerable(false);
+        this.mobType = MobType.UNDEFINED;
     }
     public static AttributeSupplier setAttributes() {
         return Mob.createMobAttributes()
                 .add(Attributes.FOLLOW_RANGE, 16.0d)
                 .add(Attributes.MOVEMENT_SPEED, 0d)
-                .add(Attributes.MAX_HEALTH, Double.MAX_VALUE)
+                .add(Attributes.MAX_HEALTH, Long.MAX_VALUE)
                 .add(Attributes.ARMOR, 0d)
                 .add(Attributes.ARMOR_TOUGHNESS,0d)
                 .add(Attributes.ATTACK_DAMAGE, 0d)
@@ -70,6 +73,7 @@ public class TestDummyEntity extends Monster {
             return InteractionResult.SUCCESS;
         } else {
             if (!player.level().isClientSide() && hand == InteractionHand.MAIN_HAND ) {
+                lastInteractPlayer = player;
                 if (player.getMainHandItem().isEmpty()) {
                     NetworkHooks.openScreen((ServerPlayer)player, new SimpleMenuProvider(
                             (id,inventory,p)->new TestDummyEntityMenu(id,inventory,this),
@@ -103,6 +107,15 @@ public class TestDummyEntity extends Monster {
 
         }
     }
+
+    @Override
+    public void die(DamageSource p_21014_) {
+        super.die(p_21014_);
+        if (this.level() instanceof ServerLevel && this.isRemoved()) {
+            this.popEquipmentSlots();
+        }
+    }
+
     @Override
     public boolean isInvulnerableTo(DamageSource source) {
         return super.isInvulnerableTo(source);
@@ -114,22 +127,43 @@ public class TestDummyEntity extends Monster {
 
     @Override
     public boolean hurt(DamageSource source, float damage) {
-        //this.heal(damage);
-        //System.out.println("收到伤害");
 
         return super.hurt(source, damage);
     }
 
+    @Override
+    protected void actuallyHurt(DamageSource source, float damage) {
+        if (!this.level().isClientSide()) {
+            if (source.getEntity() instanceof Player) {
+                this.setLastInteractPlayer((Player) source.getEntity());
+                DpsTracker.onEntityDamage(source,damage);
+                DummyEventUtils.sendHurtMessage((ServerPlayer) source.getEntity());;
+            } else {
+                Player player = this.getLastInteractPlayer();
+                if (player != null) {
+                    DpsTracker.onEntityDamage(source, player,damage);
+                    DummyEventUtils.sendHurtMessage((ServerPlayer) player);
+                }
+
+            }
+        }
+        super.actuallyHurt(source, damage);
+    }
+
+    @Override
+    public EntityType<?> getType() {
+        return super.getType();
+    }
 
     public SimpleContainer getInventory() {
         return this.inventory;
     }
     @Override
     public MobType getMobType() {
-        return type;
+        return mobType;
     }
     public void setMobType(MobType type) {
-        this.type = type;
+        this.mobType = type;
     }
     @Override
     public HumanoidArm getMainArm() {
@@ -146,6 +180,20 @@ public class TestDummyEntity extends Monster {
             ((ServerLevel)this.level()).sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.OAK_PLANKS.defaultBlockState()), this.getX(), this.getY(0.6666666666666666D), this.getZ(), 10, (double)(this.getBbWidth() / 4.0F), (double)(this.getBbHeight() / 4.0F), (double)(this.getBbWidth() / 4.0F), 0.05D);
         }
 
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        this.heal(this.getMaxHealth());
+    }
+
+    public Player getLastInteractPlayer() {
+        return lastInteractPlayer;
+    }
+
+    public void setLastInteractPlayer(Player lastInteractPlayer) {
+        this.lastInteractPlayer = lastInteractPlayer;
     }
 
     @Override

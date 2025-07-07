@@ -8,6 +8,7 @@ import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+
 @Mod.EventBusSubscriber(modid = Powerful_dummy.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ForgeEventsHandler {
     @SubscribeEvent
@@ -15,4 +16,5 @@ public class ForgeEventsHandler {
         event.addListener(new AttributeLoader());
         event.addListener(new DamageTagLoader());
     }
+
 }

@@ -76,6 +76,7 @@ public class DummyInfoPacket {
                 }
             }
         });
+
     }
     public static DummyInfoPacket decode(FriendlyByteBuf buf) {
         return new DummyInfoPacket(buf.readInt(),buf.readInt(),buf.readNbt());

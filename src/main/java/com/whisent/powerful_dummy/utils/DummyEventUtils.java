@@ -3,6 +3,9 @@ package com.whisent.powerful_dummy.utils;
 import com.whisent.powerful_dummy.data.tag.DamageTagLoader;
 import com.whisent.powerful_dummy.dps.DpsData;
 import com.whisent.powerful_dummy.dps.DpsTracker;
+import com.whisent.powerful_dummy.impl.IActionBarDisplay;
+import com.whisent.powerful_dummy.network.DpsComponentPacket;
+import com.whisent.powerful_dummy.network.NetWorkHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -10,6 +13,7 @@ import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.network.PacketDistributor;
 
 public class DummyEventUtils {
     public static void updateDpsMessages(Level level) {
@@ -39,8 +43,12 @@ public class DummyEventUtils {
 
             MutableComponent finalText = damageComponent.append(damageCountComponent)
                     .append(dpsComponent).append(totalComponent);
-            ClientboundSetActionBarTextPacket packet= new ClientboundSetActionBarTextPacket(finalText);
-            player.connection.send(packet);
+            DpsComponentPacket packet = new DpsComponentPacket(finalText);
+            ((IActionBarDisplay)player).sendActionBarMessage(Component.literal("212131313"));
+            ((IActionBarDisplay)player).sendDpsBarMessage(finalText);
+            //NetWorkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
+            //ClientboundSetActionBarTextPacket packet2= new ClientboundSetActionBarTextPacket(finalText);
+            //player.connection.send(packet2);
         }
     }
 }

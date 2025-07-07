@@ -18,6 +18,7 @@ public class DpsData {
         this.ds = damageSource;
         lastAttackTime = System.currentTimeMillis();
     }
+
     public float getLastDamage() {
         return (float) lastDamage;
     }
