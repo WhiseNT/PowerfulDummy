@@ -3,6 +3,7 @@
 
   "entity.powerful_dummy.test_dummy": "Test Dummy",
   "creativetab.powerful_dummy": "Powerful Dummy Tab",
+
   "button.powerful_dummy.undefined": "Default",
   "button.powerful_dummy.undead": "Undead",
   "button.powerful_dummy.arthropod": "Arthropod",
