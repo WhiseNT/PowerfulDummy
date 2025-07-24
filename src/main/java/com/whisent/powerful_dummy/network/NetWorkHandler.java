@@ -33,6 +33,11 @@ public class NetWorkHandler {
                 .decoder(DpsComponentPacket::decode)
                 .consumerMainThread(DpsComponentPacket::handle)
                 .add();
+        CHANNEL.messageBuilder(ClearDpsDataPacket.class, id+2)
+                .encoder(ClearDpsDataPacket::encode)
+                .decoder(ClearDpsDataPacket::decode)
+                .consumerMainThread(ClearDpsDataPacket::handle)
+                .add();
 
     }
     public static void sendToServer(Object msg) {

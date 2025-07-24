@@ -3,6 +3,7 @@ package com.whisent.powerful_dummy.entity;
 import com.whisent.powerful_dummy.dps.DpsTracker;
 import com.whisent.powerful_dummy.gui.TestDummyEntityMenu;
 import com.whisent.powerful_dummy.item.ItemRegistry;
+import com.whisent.powerful_dummy.utils.Debugger;
 import com.whisent.powerful_dummy.utils.DummyEventUtils;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -46,6 +47,9 @@ public class TestDummyEntity extends Mob {
         this.setCanPickUpLoot(false);
         this.setInvulnerable(false);
         this.mobType = MobType.UNDEFINED;
+        if (!this.level().isClientSide) {
+            Debugger.sendDebugMessage("[TestDummyEntity] Created new dummy at position: " + blockPosition());
+        }
     }
     public static AttributeSupplier setAttributes() {
         return Mob.createMobAttributes()
@@ -62,7 +66,11 @@ public class TestDummyEntity extends Mob {
 
     @Override
     public InteractionResult interactAt(Player player, Vec3 pos, InteractionHand hand) {
-        if (player.isCrouching()) {
+        if (!this.level().isClientSide) {
+            Debugger.sendDebugMessage("[TestDummyEntity] Player interaction: " + player.getName().getString() +
+                    " at position: " + pos + " with hand: " + hand.name());
+        }
+        if (player.isCrouching() && player.getMainHandItem().isEmpty()) {
             if (!player.isCreative()){
                 Block.popResource(player.level(),this.blockPosition(), new ItemStack(ItemRegistry.DUMMY_STAND.get()));
             }
@@ -73,6 +81,7 @@ public class TestDummyEntity extends Mob {
             return InteractionResult.SUCCESS;
         } else {
             if (!player.level().isClientSide() && hand == InteractionHand.MAIN_HAND ) {
+                Debugger.sendDebugMessage("[TestDummyEntity] Opening menu for player: " + player.getName().getString());
                 lastInteractPlayer = player;
                 if (player.getMainHandItem().isEmpty()) {
                     NetworkHooks.openScreen((ServerPlayer)player, new SimpleMenuProvider(
@@ -82,6 +91,9 @@ public class TestDummyEntity extends Mob {
                         friendlyByteBuf.writeInt(this.getId());
                     });
                     return InteractionResult.SUCCESS;
+                } else {
+                    Debugger.sendDebugMessage("[TestDummyEntity] Player holding item: " +
+                            player.getMainHandItem().getDisplayName().getString());
                 }
             }
         }
@@ -92,6 +104,7 @@ public class TestDummyEntity extends Mob {
         this.getAllSlots().forEach(itemStack -> {
              if (!itemStack.isEmpty()) {
                 Block.popResource(this.level(),this.blockPosition(), itemStack);
+                Debugger.sendDebugMessage("[TestDummyEntity] Popped item: " + itemStack.getDisplayName().getString());
             }
         });
         if (ModList.get().isLoaded( "curios")) {
@@ -102,6 +115,8 @@ public class TestDummyEntity extends Mob {
                         .getEquippedCurios().getStackInSlot(i);
                 if (!itemStack.isEmpty()) {
                     Block.popResource(this.level(),this.blockPosition(),itemStack);
+                    Debugger.sendDebugMessage("[TestDummyEntity] Popped curios item: " +
+                            itemStack.getDisplayName().getString());
                 }
             }
 
@@ -111,6 +126,9 @@ public class TestDummyEntity extends Mob {
     @Override
     public void die(DamageSource p_21014_) {
         super.die(p_21014_);
+        if (!this.level().isClientSide) {
+            Debugger.sendDebugMessage("[TestDummyEntity] Dummy died due to: " + p_21014_.getMsgId());
+        }
         if (this.level() instanceof ServerLevel && this.isRemoved()) {
             this.popEquipmentSlots();
         }
@@ -118,6 +136,7 @@ public class TestDummyEntity extends Mob {
 
     @Override
     public boolean isInvulnerableTo(DamageSource source) {
+
         return super.isInvulnerableTo(source);
     }
     @Override
@@ -127,13 +146,21 @@ public class TestDummyEntity extends Mob {
 
     @Override
     public boolean hurt(DamageSource source, float damage) {
-
+        if (!this.level().isClientSide) {
+            Debugger.sendDebugMessage("[TestDummyEntity] Hurt by: " + source.getMsgId() +
+                    " with damage: " + damage + " - Source entity: " +
+                    (source.getEntity() != null ? source.getEntity().getName().getString() : "null"));
+        }
         return super.hurt(source, damage);
     }
 
     @Override
     protected void actuallyHurt(DamageSource source, float damage) {
         if (!this.level().isClientSide()) {
+            Debugger.sendDebugMessage("[TestDummyEntity] Actually hurt by: " + source.getMsgId() +
+                    " | Damage: " + damage + " | Source: " +
+                    (source.getEntity() != null ? source.getEntity().getName().getString() : "null"));
+
             if (source.getEntity() instanceof Player) {
                 this.setLastInteractPlayer((Player) source.getEntity());
                 DpsTracker.onEntityDamage(source,damage);
@@ -141,6 +168,10 @@ public class TestDummyEntity extends Mob {
             } else {
                 Player player = this.getLastInteractPlayer();
                 if (player != null) {
+                    Debugger.sendDebugMessage("[TestDummyEntity] Indirect damage from: " +
+                            source.getEntity().getName().getString() +
+                            " | Assigned to player: " + player.getName().getString());
+
                     DpsTracker.onEntityDamage(source, player,damage);
                     DummyEventUtils.sendHurtMessage((ServerPlayer) player);
                 }
@@ -170,12 +201,16 @@ public class TestDummyEntity extends Mob {
         return null;
     }
     public void kill() {
+        if (!this.level().isClientSide) {
+            Debugger.sendDebugMessage("[TestDummyEntity] Killing dummy");
+        }
         this.dead = true;
         this.discard();
         this.remove(Entity.RemovalReason.KILLED);
         this.gameEvent(GameEvent.ENTITY_DIE);
     }
     private void showBreakingParticles() {
+        Debugger.sendDebugMessage("[TestDummyEntity] Showing breaking particles");
         if (this.level() instanceof ServerLevel) {
             ((ServerLevel)this.level()).sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.OAK_PLANKS.defaultBlockState()), this.getX(), this.getY(0.6666666666666666D), this.getZ(), 10, (double)(this.getBbWidth() / 4.0F), (double)(this.getBbHeight() / 4.0F), (double)(this.getBbWidth() / 4.0F), 0.05D);
         }

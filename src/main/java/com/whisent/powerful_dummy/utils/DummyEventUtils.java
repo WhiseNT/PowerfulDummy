@@ -44,8 +44,8 @@ public class DummyEventUtils {
             MutableComponent finalText = damageComponent.append(damageCountComponent)
                     .append(dpsComponent).append(totalComponent);
             DpsComponentPacket packet = new DpsComponentPacket(finalText);
-            ((IActionBarDisplay)player).sendActionBarMessage(Component.literal("212131313"));
-            ((IActionBarDisplay)player).sendDpsBarMessage(finalText);
+            ((IActionBarDisplay)player).sendActionBarMessage(finalText);
+            //((IActionBarDisplay)player).sendDpsBarMessage(finalText);
             //NetWorkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
             //ClientboundSetActionBarTextPacket packet2= new ClientboundSetActionBarTextPacket(finalText);
             //player.connection.send(packet2);

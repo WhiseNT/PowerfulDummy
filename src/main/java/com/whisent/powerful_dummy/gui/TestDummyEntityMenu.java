@@ -4,7 +4,9 @@ import com.whisent.powerful_dummy.entity.TestDummyEntity;
 import com.whisent.powerful_dummy.gui.container.TestDummyArmorContainer;
 import com.whisent.powerful_dummy.gui.container.TestDummyCuriosContainer;
 import com.whisent.powerful_dummy.gui.slot.TestDummyCurioSlot;
+import com.whisent.powerful_dummy.utils.Debugger;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -32,6 +34,9 @@ public class TestDummyEntityMenu extends AbstractContainerMenu {
     public TestDummyEntityMenu(int containerId, Inventory inv, @Nullable TestDummyEntity entity) {
         super(MenuRegistry.TEST_DUMMY_MENU.get(), containerId);
         this.entity = entity;
+        Debugger.sendDebugMessage("[TestDummyEntityMenu] Creating menu for entity: " +
+                (entity != null ? entity.getId() : "null"));
+
         this.armorContainer = new TestDummyArmorContainer(entity);
         if (entity != null) {
             // 添加盔甲槽位（从槽位索引 0 开始）
@@ -47,10 +52,17 @@ public class TestDummyEntityMenu extends AbstractContainerMenu {
 
     private static TestDummyEntity getEntityFromBuf(FriendlyByteBuf buf, Level level) {
         int entityId = buf.readInt();
-        return (TestDummyEntity) level.getEntity(entityId);
+        Debugger.sendDebugMessage("[TestDummyEntityMenu] Reading entity ID from buffer: " + entityId);
+        Entity entity = level.getEntity(entityId);
+        if (entity instanceof TestDummyEntity) {
+            Debugger.sendDebugMessage("[TestDummyEntityMenu] Found TestDummyEntity: " + entityId);
+            return (TestDummyEntity) entity;
+        }
+        Debugger.sendDebugMessage("[TestDummyEntityMenu] Entity not found or not a TestDummyEntity: " + entityId);
+        return null;
     }
     private EquipmentSlot getEquipmentSlot(int slot) {
-        return switch (slot) {
+        EquipmentSlot result = switch (slot) {
             case 0 -> EquipmentSlot.HEAD;
             case 1 -> EquipmentSlot.CHEST;
             case 2 -> EquipmentSlot.LEGS;
@@ -59,34 +71,50 @@ public class TestDummyEntityMenu extends AbstractContainerMenu {
             case 5 -> EquipmentSlot.OFFHAND;
             default -> null;
         };
+        Debugger.sendDebugMessage("[TestDummyEntityMenu] Mapping slot " + slot + " to equipment slot: " + result);
+        return result;
     }
     private void addArmorSlots(TestDummyEntity entity) {
+        Debugger.sendDebugMessage("[TestDummyEntityMenu] Adding armor slots for entity: " + entity.getId());
+
         for (int i = 0; i < 6; ++i) {
             this.addSlot(new Slot(armorContainer, i, i * 18 + 21, 8) {
                 @Override
-                public boolean mayPlace(ItemStack stack) {
+                public boolean mayPlace(@NotNull ItemStack stack) {
+                    boolean canPlace;
                     if (this.index < 4) {
-                        return stack.getItem() instanceof ArmorItem armorItem &&
+                        canPlace = stack.getItem() instanceof ArmorItem armorItem &&
                                 armorItem.getEquipmentSlot() == getEquipmentSlot(this.index);
                     } else {
-                        return true;
+                        canPlace = true;
                     }
 
+                    Debugger.sendDebugMessage("[TestDummyEntityMenu] Slot " + this.index +
+                            " can place item '" + stack.getDisplayName().getString() +
+                            "'? " + canPlace);
+                    return canPlace;
                 }
             });
         }
+        Debugger.sendDebugMessage("[TestDummyEntityMenu] Add armor slots successfully for entity: " + entity.getId());
     }
     @Override
     public @NotNull ItemStack quickMoveStack(Player player, int index) {
+        Debugger.sendDebugMessage("[TestDummyEntityMenu] Quick move stack from slot: " + index);
+
         ItemStack originalStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
 
-        if (slot != null && slot.hasItem()) {
+        if (slot.hasItem()) {
             ItemStack itemStack = slot.getItem();
             originalStack = itemStack.copy();
-
+            Debugger.sendDebugMessage("[TestDummyEntityMenu] Moving item: " +
+                    itemStack.getDisplayName().getString() +
+                    " (count: " + itemStack.getCount() + ")");
             // 1. 从盔甲栏/手持栏转移 (0-5)
             if (index < 6) {
+                Debugger.sendDebugMessage("[TestDummyEntityMenu] Moving from armor/hand slot");
+
                 // 先尝试饰品栏 (42+)
                 if (!moveItemStackTo(itemStack, 42, slots.size(), false)) {
                     // 再尝试玩家背包 (6-42)
@@ -97,6 +125,8 @@ public class TestDummyEntityMenu extends AbstractContainerMenu {
             }
             // 2. 从玩家背包转移 (6-41)
             else if (index < 42) {
+                Debugger.sendDebugMessage("[TestDummyEntityMenu] Moving from player inventory");
+
                 // 优先级1: 饰品栏 (42+)
                 if (!moveItemStackTo(itemStack, 42, slots.size(), false)) {
                     // 优先级2: 匹配的盔甲栏 (0-3)
@@ -121,6 +151,8 @@ public class TestDummyEntityMenu extends AbstractContainerMenu {
             }
             // 3. 从饰品栏转移 (42+)
             else {
+                Debugger.sendDebugMessage("[TestDummyEntityMenu] Moving from curios slot");
+
                 // 直接尝试玩家背包 (6-42)
                 if (!moveItemStackTo(itemStack, 6, 42, false)) {
                     return ItemStack.EMPTY;
@@ -156,6 +188,8 @@ public class TestDummyEntityMenu extends AbstractContainerMenu {
     }
 
     private void addPlayerSlots(Inventory playerInventory) {
+        Debugger.sendDebugMessage("[TestDummyEntityMenu] Adding player inventory slots");
+
         // 主背包（3x9）位置偏移
         final int SLOT_X_SPACING = 18;
         final int SLOT_Y_SPACING = 18;
@@ -177,9 +211,12 @@ public class TestDummyEntityMenu extends AbstractContainerMenu {
         for (int col = 0; col < HOTBAR_SLOT_COUNT; col++) {
             int x = PLAYER_INV_START_X + col * SLOT_X_SPACING;
             this.addSlot(new Slot(playerInventory, col, x, HOTBAR_Y));
+
         }
+        Debugger.sendDebugMessage("[TestDummyEntityMenu] Add player slots successfully for entity: " + entity.getId());
     }
     private void addCurioSlots(TestDummyEntity entity) {
+        Debugger.sendDebugMessage("[TestDummyEntityMenu] Adding curios slots for entity: " + entity.getId());
 
         this.curiosContainer = new TestDummyCuriosContainer(entity);
         int slotIndex = 0;
@@ -206,6 +243,7 @@ public class TestDummyEntityMenu extends AbstractContainerMenu {
             String identifier = entry.getKey();
 
         }
+        Debugger.sendDebugMessage("[TestDummyEntityMenu] Add curios slots successfully for entity: " + entity.getId());
     }
     public TestDummyCuriosContainer getCuriosContainer() {
         return curiosContainer;

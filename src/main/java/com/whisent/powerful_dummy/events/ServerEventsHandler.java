@@ -68,6 +68,7 @@ public class ServerEventsHandler {
             LivingEntity entity = event.getEntity();
             entity.setHealth(entity.getMaxHealth());
             event.setCanceled(true);
+
         }
     }
 

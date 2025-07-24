@@ -35,8 +35,8 @@ public class TestDummyCurioSlot extends Slot {
                     curiosContainer.getIdentifierIndex(identifier,slotIndex), itemStack, true
             ).equals(itemStack);
 
-            System.out.println("能否放入"+identifier);
-            System.out.println("能否放入"+flag2);
+            //System.out.println("能否放入"+identifier);
+            //System.out.println("能否放入"+flag2);
             if (this.hasItem()) {
                 if (flag2) {
                     return true;

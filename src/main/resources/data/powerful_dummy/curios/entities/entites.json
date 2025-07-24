@@ -1,6 +1,5 @@
 {
   "entities": [
-    "minecraft:player",
     "powerful_dummy:test_dummy"
   ],
   "slots": [
@@ -9,8 +8,6 @@
     "belt",
     "bracelet",
     "charm",
-    "curio",
-    "example",
     "hands",
     "head",
     "necklace",

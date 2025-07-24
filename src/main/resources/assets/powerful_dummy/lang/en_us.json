@@ -19,5 +19,18 @@
 
   "chat.powerful_dummy.damage": "Last Damage: ",
   "chat.powerful_dummy.dps": " DPS: ",
-  "chat.powerful_dummy.total_damage": " Total: "
+  "chat.powerful_dummy.total_damage": " Total: ",
+  "chat.powerful_dummy.damagelog_title": "",
+
+  "chat.powerful_dummy.damagelog.display": "Showing recent %s records",
+  "chat.powerful_dummy.damagelog.display2": "(Total: %s)",
+  "chat.powerful_dummy.damagelog.title": "===== Dummy Damage Log =====",
+  "chat.powerful_dummy.damagelog.nodata": "No records available",
+  "chat.powerful_dummy.damagelog.return": "Type /damagelog to view all records",
+
+  "key.categories.powerful_dummy": "Powerful Dummy",
+  "key.powerful_dummy.cleardps": "Clear Dps",
+  "powerful_dummy.dps.cleared": "DpsData has cleared",
+  "chat.powerful_dummy.damagelog.time.set": "将记录时间设置为: %s 秒",
+  "chat.powerful_dummy.damagelog.time.current": "当前记录时间: %s 秒"
 }

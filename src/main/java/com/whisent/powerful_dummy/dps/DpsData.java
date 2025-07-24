@@ -4,19 +4,28 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class DpsData {
     private double totalDamage = 0.0;
     private double lastDamage = 0.0f;
     private DamageSource ds;
+    private final List<DamageData> damageDataList;
     private long startTime = System.currentTimeMillis();
     private long lastAttackTime = System.currentTimeMillis();
-    private static final long REST_TIME = 1_000;
-
+    private long resetTime = 3_000;
+    public DpsData() {
+        this.ds = null;
+        this.damageDataList = new ArrayList<>();
+    }
     public void addDamage(double damage,DamageSource damageSource) {
         totalDamage += damage;
         lastDamage = damage;
         this.ds = damageSource;
         lastAttackTime = System.currentTimeMillis();
+        damageDataList.add(new DamageData(damage, damageSource, getDps()));
     }
 
     public float getLastDamage() {
@@ -35,7 +44,7 @@ public class DpsData {
     }
     public boolean needsReset() {
         long now = System.currentTimeMillis();
-        return now - lastAttackTime > REST_TIME;
+        return now - lastAttackTime > getResetTime();
     }
     public boolean hasDamageTag(TagKey<DamageType> tag) {
         return this.ds.is(tag);
@@ -49,5 +58,18 @@ public class DpsData {
         totalDamage = 0.0;
         startTime = System.currentTimeMillis();
         lastAttackTime = startTime;
+        damageDataList.clear();
+    }
+
+    public List<DamageData> getDamageDataList() {
+        return damageDataList;
+    }
+
+    public long getResetTime() {
+        return resetTime;
+    }
+    public void setResetTime(int seconds) {
+
+        this.resetTime = seconds * 1000L;
     }
 }
