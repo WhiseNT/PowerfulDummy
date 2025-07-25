@@ -157,19 +157,24 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
             //int identifierIndex =  this.menu.getCuriosContainer().getIdentifierIndex(identifier,index);
 
             ItemStack item = handler.getEquippedCurios().getStackInSlot(index);
-            ResourceLocation icon = CuriosApi.getSlot(identifier).get().getIcon();
-            ResourceLocation newIcon = new ResourceLocation(icon.getNamespace(), "textures/"+icon.getPath()+".png");
-            RenderSystem.setShaderTexture(0, newIcon);
-            RenderSystem.setShaderTexture(0, CURIOS_TEX);
-            int x = startX - col * slotSize;
-            int y = startY + row * (slotSize + gap);
-            guiGraphics.blit(CURIOS_TEX, x,y,0,32, 0, 18, 18,200,200);
-            if (item.isEmpty()) {
-                guiGraphics.blit(newIcon, x, y,
-                        0, 0,
-                        18, 18,
-                        18, 18);
+            if (CuriosApi.getSlot(identifier).isPresent()) {
+                ResourceLocation icon = CuriosApi.getSlot(identifier).get().getIcon();
+                if (icon != null) {
+                    ResourceLocation newIcon = new ResourceLocation(icon.getNamespace(), "textures/"+icon.getPath()+".png");
+                    RenderSystem.setShaderTexture(0, newIcon);
+                    RenderSystem.setShaderTexture(0, CURIOS_TEX);
+                    int x = startX - col * slotSize;
+                    int y = startY + row * (slotSize + gap);
+                    guiGraphics.blit(CURIOS_TEX, x,y,0,32, 0, 18, 18,200,200);
+                    if (item.isEmpty()) {
+                        guiGraphics.blit(newIcon, x, y,
+                                0, 0,
+                                18, 18,
+                                18, 18);
+                    }
+                }
             }
+
             row++;
             index++;
 
