@@ -23,8 +23,6 @@ public class ClientEventHandler {
     @SubscribeEvent
     public static void onKeyPress(InputEvent.Key event) {
         if (Powerful_dummy.ClientModEvents.CLEAR_DPS_DATA.consumeClick()) {
-            // 按键触发逻辑
-            System.out.println("自定义按键被按下!");
             LocalPlayer player = Minecraft.getInstance().player;
             if (player != null) {
                 byte clear = 1;

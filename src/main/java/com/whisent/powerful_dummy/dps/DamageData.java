@@ -1,7 +1,6 @@
 package com.whisent.powerful_dummy.dps;
 
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageType;
 
 public class DamageData {
     private final double amount;

@@ -5,15 +5,12 @@ import com.whisent.powerful_dummy.dps.DpsData;
 import com.whisent.powerful_dummy.dps.DpsTracker;
 import com.whisent.powerful_dummy.impl.IActionBarDisplay;
 import com.whisent.powerful_dummy.network.DpsComponentPacket;
-import com.whisent.powerful_dummy.network.NetWorkHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.PacketDistributor;
 
 public class DummyEventUtils {
     public static void updateDpsMessages(Level level) {
@@ -25,11 +22,12 @@ public class DummyEventUtils {
     }
     public static void sendHurtMessage(ServerPlayer player) {
 
-        float dps = DpsTracker.getDps(player);
-        if (dps > 0.0f) {
+        float totalDamage = DpsTracker.getDpsData(player).getTotalDamage();
+        if (!DpsTracker.getDpsData(player).needsReset() && totalDamage > 0.0f) {
             DpsData data = DpsTracker.getDpsData(player);
             int color = DamageTagLoader.findDisplayColor(data.getDamageSource());
             float damage = data.getLastDamage();
+            float dps = DpsTracker.getDps(player);
             float total = data.getTotalDamage();
             MutableComponent damageComponent = Component.translatable("chat.powerful_dummy.damage")
                     .withStyle(style -> style.withColor(ChatFormatting.WHITE));

@@ -6,7 +6,6 @@ import net.minecraft.world.damagesource.DamageType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class DpsData {
     private double totalDamage = 0.0;
@@ -21,6 +20,9 @@ public class DpsData {
         this.damageDataList = new ArrayList<>();
     }
     public void addDamage(double damage,DamageSource damageSource) {
+        if (needsReset()) {
+            reset();
+        }
         totalDamage += damage;
         lastDamage = damage;
         this.ds = damageSource;

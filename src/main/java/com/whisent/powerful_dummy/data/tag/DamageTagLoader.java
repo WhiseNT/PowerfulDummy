@@ -38,6 +38,7 @@ public class DamageTagLoader extends SimpleJsonResourceReloadListener {
     public static int findDisplayColor(DamageSource source) {
         for (DamageTagData config : CONFIGS.values()) {
             for (DamageTagData.DamageTagEntry entry : config.tags) {
+                if (source == null) return 0xffffff;
                 if (source.is(entry.getTag())) {
                     return entry.getDisplayColor();
                 }

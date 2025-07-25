@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.logging.LogUtils;
 import com.whisent.powerful_dummy.client.DpsActionBar;
 import com.whisent.powerful_dummy.client.KeyHandler;
-import com.whisent.powerful_dummy.client.event.ClientEventHandler;
 import com.whisent.powerful_dummy.entity.DummyEntityRegistry;
 import com.whisent.powerful_dummy.entity.TestDummyEntity;
 import com.whisent.powerful_dummy.entity.client.TestDummyModel;

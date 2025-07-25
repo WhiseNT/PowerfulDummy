@@ -6,7 +6,6 @@ import com.whisent.powerful_dummy.Powerful_dummy;
 import com.whisent.powerful_dummy.data.AttributeLoader;
 import com.whisent.powerful_dummy.data.tag.DamageTagLoader;
 import com.whisent.powerful_dummy.dps.DamageData;
-import com.whisent.powerful_dummy.dps.DpsData;
 import com.whisent.powerful_dummy.dps.DpsTracker;
 import com.whisent.powerful_dummy.utils.Debugger;
 import com.whisent.powerful_dummy.utils.TimeUtils;
@@ -15,14 +14,11 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -140,8 +136,10 @@ public class ForgeEventsHandler {
                             .withStyle(style -> style.withColor(ChatFormatting.WHITE)));
 
             // 添加时间戳信息
-            MutableComponent timeComponent = Component.literal(
-                            " [" + TimeUtils.formatRelativeTime(damageData.getTimestamp()) + "]")
+            MutableComponent timeComponent =
+                    Component.literal(" [")
+                    .append(TimeUtils.formatRelativeTime(damageData.getTimestamp()))
+                    .append(Component.literal("] "))
                     .withStyle(ChatFormatting.GRAY);
 
             MutableComponent totalComponent = damageComponent
@@ -154,7 +152,7 @@ public class ForgeEventsHandler {
 
         // 添加提示信息
         if (list.size() > maxEntries) {
-            player.sendSystemMessage(Component.translatable("chat.powerful_dummy.damagelog.return")
+            player.sendSystemMessage(Component.translatable("chat.powerful_dummy.damagelog.return",list.size())
                     .withStyle(ChatFormatting.GREEN));
         }
     }

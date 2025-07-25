@@ -19,8 +19,5 @@ public class KeyHandler {
 
     public static void onKeyInput(InputEvent.Key event) {
         Minecraft mc = Minecraft.getInstance();
-        if (event.getKey() == GLFW.GLFW_KEY_J && event.getAction() == GLFW.GLFW_PRESS) {
-            DpsActionBar.sendText(Component.literal("这是一个自定义的 ActionBar 文字"));
-        }
     }
 }

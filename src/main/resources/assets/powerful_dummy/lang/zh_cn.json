@@ -20,13 +20,17 @@
   "chat.powerful_dummy.damage": "单次伤害: ",
   "chat.powerful_dummy.dps": " DPS: ",
   "chat.powerful_dummy.total_damage": " 总伤: ",
-  "chat.powerful_dummy.damagelog_title": "",
 
   "chat.powerful_dummy.damagelog.display": "显示最近的 %s 条记录",
   "chat.powerful_dummy.damagelog.display2": "(共 %s 条)",
   "chat.powerful_dummy.damagelog.title": "===== 假人伤害日志 =====",
   "chat.powerful_dummy.damagelog.nodata": "现在没有任何记录",
   "chat.powerful_dummy.damagelog.return": "输入 /damagelog 查看全部记录",
+
+  "chat.powerful_dummy.damagelog.time.set": "数据显示时间设置为: %s 秒",
+  "chat.powerful_dummy.damagelog.time.current": "当前数据显示时间: %s 秒",
+  "chat.powerful_dummy.damagelog.time.secondsago": " %s  秒前",
+  "chat.powerful_dummy.damagelog.time.justnow": "刚刚",
 
   "key.categories.powerful_dummy": "强力假人",
   "key.powerful_dummy.cleardps": "清除伤害数据",
