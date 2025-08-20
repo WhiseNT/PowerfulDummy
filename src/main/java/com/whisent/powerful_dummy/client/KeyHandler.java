@@ -4,12 +4,13 @@ package com.whisent.powerful_dummy.client;
 import com.whisent.powerful_dummy.Powerful_dummy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.glfw.GLFW;
 
-@Mod.EventBusSubscriber(modid = Powerful_dummy.MODID)
+@Mod.EventBusSubscriber(modid = Powerful_dummy.MODID,value = { Dist.CLIENT })
 public class KeyHandler {
 
     public static void init() {

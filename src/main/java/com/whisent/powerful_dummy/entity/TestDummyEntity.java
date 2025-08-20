@@ -2,6 +2,7 @@ package com.whisent.powerful_dummy.entity;
 
 import com.whisent.powerful_dummy.dps.DpsTracker;
 import com.whisent.powerful_dummy.gui.TestDummyEntityMenu;
+import com.whisent.powerful_dummy.impl.IActionBarDisplay;
 import com.whisent.powerful_dummy.item.ItemRegistry;
 import com.whisent.powerful_dummy.utils.Debugger;
 import com.whisent.powerful_dummy.utils.DummyEventUtils;
@@ -29,6 +30,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.network.NetworkHooks;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CuriosCapability;
 
@@ -43,6 +45,7 @@ public class TestDummyEntity extends Mob {
         this.xpReward = 0;
         this.setCanPickUpLoot(false);
         this.setInvulnerable(false);
+        this.setPersistenceRequired();
         this.mobType = MobType.UNDEFINED;
         if (!this.level().isClientSide) {
             Debugger.sendDebugMessage("[TestDummyEntity] Created new dummy at position: " + blockPosition());
@@ -105,6 +108,7 @@ public class TestDummyEntity extends Mob {
             }
         });
         if (ModList.get().isLoaded( "curios")) {
+            if (this.getCapability(CuriosCapability.INVENTORY).resolve().isEmpty()) return;
             int amount = this.getCapability(CuriosCapability.INVENTORY).resolve().get()
                     .getEquippedCurios().getSlots();
             for (int i = 0; i < amount; i++) {
@@ -144,39 +148,63 @@ public class TestDummyEntity extends Mob {
     @Override
     public boolean hurt(DamageSource source, float damage) {
         if (!this.level().isClientSide) {
+            String entityName = "null";
+            if (source.getEntity() != null) {
+                Component nameComponent = source.getEntity().getName();
+                if (nameComponent != null) {
+                    entityName = nameComponent.getString();
+                }
+            }
             Debugger.sendDebugMessage("[TestDummyEntity] Hurt by: " + source.getMsgId() +
-                    " with damage: " + damage + " - Source entity: " +
-                    (source.getEntity() != null ? source.getEntity().getName().getString() : "null"));
+                    " with damage: " + damage + " - Source entity: " + entityName);
         }
         return super.hurt(source, damage);
     }
 
     @Override
-    protected void actuallyHurt(DamageSource source, float damage) {
+    protected void actuallyHurt(@NotNull DamageSource source, float damage) {
         if (!this.level().isClientSide()) {
-            Debugger.sendDebugMessage("[TestDummyEntity] Actually hurt by: " + source.getMsgId() +
-                    " | Damage: " + damage + " | Source: " +
-                    (source.getEntity() != null ? source.getEntity().getName().getString() : "null"));
+            if (source == null) return;
 
-            if (source.getEntity() instanceof Player) {
-                this.setLastInteractPlayer((Player) source.getEntity());
-                DpsTracker.onEntityDamage(source,damage);
-                DummyEventUtils.sendHurtMessage((ServerPlayer) source.getEntity());;
-            } else {
-                Player player = this.getLastInteractPlayer();
-                if (player != null) {
-                    Debugger.sendDebugMessage("[TestDummyEntity] Indirect damage from: " +
-                            source.getEntity().getName().getString() +
-                            " | Assigned to player: " + player.getName().getString());
+            String entityName = "null";
+            String damageSourceMsgId = "null";
 
-                    DpsTracker.onEntityDamage(source, player,damage);
-                    DummyEventUtils.sendHurtMessage((ServerPlayer) player);
+            var entity = source.getEntity();
+            if (entity != null) {
+                var name = entity.getName();
+                if (name != null) {
+                    entityName = name.getString();
                 }
+            }
 
+            var msgId = source.getMsgId();
+            if (msgId != null) {
+                damageSourceMsgId = msgId;
+            }
+
+            Debugger.sendDebugMessage(String.format("[TestDummyEntity] Actually hurt by: %s | Damage: %f | Source: %s",
+                    damageSourceMsgId, damage, entityName));
+
+            Player player = null;
+            if (entity instanceof Player) {
+                player = (Player) entity;
+                this.setLastInteractPlayer(player);
+                DpsTracker.onEntityDamage(source, damage);
+            } else {
+                player = this.getLastInteractPlayer();
+                if (player != null) {
+                    DpsTracker.onEntityDamage(source, player, damage);
+                }
+            }
+
+            if (player instanceof ServerPlayer serverPlayer) {
+                DummyEventUtils.sendHurtMessage(serverPlayer);
+                ((IActionBarDisplay)player).powerfulDummy$sendDamage(damage, false);
             }
         }
         super.actuallyHurt(source, damage);
     }
+
 
     @Override
     public EntityType<?> getType() {
@@ -193,10 +221,7 @@ public class TestDummyEntity extends Mob {
     public void setMobType(MobType type) {
         this.mobType = type;
     }
-    @Override
-    public HumanoidArm getMainArm() {
-        return null;
-    }
+
     public void kill() {
         if (!this.level().isClientSide) {
             Debugger.sendDebugMessage("[TestDummyEntity] Killing dummy");
@@ -211,14 +236,24 @@ public class TestDummyEntity extends Mob {
         if (this.level() instanceof ServerLevel) {
             ((ServerLevel)this.level()).sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.OAK_PLANKS.defaultBlockState()), this.getX(), this.getY(0.6666666666666666D), this.getZ(), 10, (double)(this.getBbWidth() / 4.0F), (double)(this.getBbHeight() / 4.0F), (double)(this.getBbWidth() / 4.0F), 0.05D);
         }
-
     }
 
 
     @Override
     public void tick() {
         super.tick();
-        this.heal(this.getMaxHealth());
+        if (this.getHealth() < this.getMaxHealth()) {
+            this.heal(this.getMaxHealth() - this.getHealth()); // 仅在需要时恢复
+        }
+    }
+
+    @Override
+    public boolean shouldBeSaved() {
+        return true;
+    }
+    @Override
+    public boolean removeWhenFarAway(double distanceToClosestPlayer) {
+        return false;
     }
 
     public Player getLastInteractPlayer() {

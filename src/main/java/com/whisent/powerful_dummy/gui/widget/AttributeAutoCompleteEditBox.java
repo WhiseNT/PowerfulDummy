@@ -56,32 +56,45 @@ public class AttributeAutoCompleteEditBox extends AbstractAutoCompleteEditBox {
     }
     @Override
     protected void drawSuggestions(GuiGraphics guiGraphics, List<String> list, int mouseX, int mouseY) {
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+
         this.loadSuggestions();
+
         int x = this.getX();
         int y = this.getY() + this.getHeight();
         int width = this.getWidth();
         int visibleCount = Math.min(SUGGESTIONS_VISIBLE_COUNT, list.size());
+
         guiGraphics.fill(x, y, x + width, y + visibleCount * 12, 0x90000000);
+
+        Minecraft mc = Minecraft.getInstance();
+        Font font = mc.font;
+
         for (int i = 0; i < visibleCount; i++) {
             int index = i + scrollOffset;
-            if (index >= list.size()) break;
+            if (index < 0 || index >= list.size()) {
+                continue;
+            }
+
             String suggestion = list.get(index);
             boolean hovered = mouseX >= x && mouseX <= x + width && mouseY >= y + i * 12 && mouseY <= y + (i + 1) * 12;
+
             if (hovered || index == selectedIndex) {
                 guiGraphics.fill(x, y + i * 12, x + width, y + (i + 1) * 12, 0xB0555555);
             }
-            String finalSuggestion = suggestion;
-            if (suggestion.length() >= 7 && Minecraft.getInstance().getLanguageManager().getSelected().equals("zh_cn")) {
-                finalSuggestion = suggestion.substring(0, 7) + "..";
-            } else if (suggestion.length() >= 11) {
-                finalSuggestion = suggestion.substring(0, 11) + "..";
-            }
-            if (attributesNotZero.getOrDefault(suggestion,false)) {
-                guiGraphics.drawString(Minecraft.getInstance().font, finalSuggestion, x + 4, y + i * 12 + 2, 0xfca800);
+            String finalSuggestion;
+            int maxWidth = 88;
+            if (font.width(suggestion) > maxWidth) {
+                finalSuggestion = font.plainSubstrByWidth(suggestion, maxWidth) + "..";
             } else {
-                guiGraphics.drawString(Minecraft.getInstance().font, finalSuggestion, x + 4, y + i * 12 + 2, 0xE0E0E0);
+                finalSuggestion = suggestion;
             }
 
+            int color = attributesNotZero.getOrDefault(suggestion, false) ? 0xfca800 : 0xE0E0E0;
+            guiGraphics.drawString(font, finalSuggestion, x + 4, y + i * 12 + 2, color);
         }
     }
+
 }

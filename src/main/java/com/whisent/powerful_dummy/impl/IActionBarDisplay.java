@@ -4,5 +4,5 @@ import net.minecraft.network.chat.Component;
 
 public interface IActionBarDisplay {
     void sendActionBarMessage(Component message);
-    void sendDpsBarMessage(Component message);
+    void powerfulDummy$sendDamage(double damage, boolean flag);
 }

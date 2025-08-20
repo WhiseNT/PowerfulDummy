@@ -1,6 +1,7 @@
 package com.whisent.powerful_dummy.mixin;
 
 import com.whisent.powerful_dummy.impl.IActionBarDisplay;
+import com.whisent.powerful_dummy.network.DamageDataPacket;
 import com.whisent.powerful_dummy.network.DpsComponentPacket;
 import com.whisent.powerful_dummy.network.NetWorkHandler;
 import net.minecraft.network.chat.Component;
@@ -21,11 +22,11 @@ public class ServerPlayerMixin implements IActionBarDisplay {
     }
 
     @Override
-    public void sendDpsBarMessage(Component message) {
+    public void powerfulDummy$sendDamage(double damage, boolean flag) {
         if (((ServerPlayer)(Object)this).connection != null) { // 确保连接存在
-            DpsComponentPacket packet = new DpsComponentPacket(message);
+            DamageDataPacket packet2 = new DamageDataPacket(damage,false);
             NetWorkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(
-                    () -> ((ServerPlayer)(Object)this)), packet);
+                    () -> ((ServerPlayer)(Object)this)), packet2);
         }
     }
 

@@ -23,7 +23,6 @@ public class DamageData {
         return damageSource;
     }
 
-
     public double getCurrentDps() {
         return currentDps;
     }

@@ -7,7 +7,6 @@ import com.whisent.powerful_dummy.data.AttributeLoader;
 import com.whisent.powerful_dummy.entity.TestDummyEntity;
 import com.whisent.powerful_dummy.gui.widget.AttributeAutoCompleteEditBox;
 import com.whisent.powerful_dummy.gui.widget.CustomFocusButton;
-import com.whisent.powerful_dummy.gui.widget.MobEffectAutoCompleteEditBox;
 import com.whisent.powerful_dummy.network.DummyInfoPacket;
 import com.whisent.powerful_dummy.network.NetWorkHandler;
 import com.whisent.powerful_dummy.utils.EditBoxInfoHelper;
@@ -28,6 +27,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.ModList;
+import org.jetbrains.annotations.NotNull;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
@@ -42,12 +42,11 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
     private static final ResourceLocation CURIOS_TEX =
             new ResourceLocation(Powerful_dummy.MODID, "textures/gui/test_dummy_curios.png");
     private MobType mobType;
-    private MobEffectAutoCompleteEditBox mobEffectAutoCompleteEditBox;
     private AttributeAutoCompleteEditBox attributeAutoCompleteBox;
     private CustomFocusButton applyAttributeButton;
     private EditBox attributeInputField;
-    private CompoundTag attributesMap = new CompoundTag();
-    public TestDummyEntityScreen(TestDummyEntityMenu menu, Inventory inventory, Component title) {
+    private final CompoundTag attributesMap = new CompoundTag();
+    public TestDummyEntityScreen(TestDummyEntityMenu menu, Inventory inventory,Component title) {
         super(menu, inventory, Component.literal("测试"));
         this.imageWidth = 200; // GUI宽度
         this.imageHeight = 200; // GUI高度
@@ -98,31 +97,32 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
         entity.getAllSlots().forEach(slots::add);
         Collections.reverse(slots);
         for (int i = 0; i < slots.size(); i++) {
-            if (slots.get(i).isEmpty()) {
-
-            }
             if (i < 4) {
                 if (slots.get(i).isEmpty()) {
                     ResourceLocation icon = this.getIconByIndex(i);
-                    guiGraphics.blit(icon, x, startY,
-                            0, 0,
-                            16, 16,
-                            16, 16);
-                };
+                    if (icon != null) {
+                        guiGraphics.blit(icon, x, startY,
+                                0, 0,
+                                16, 16,
+                                16, 16);
+                    }
+                }
             } else {
                 int iFix = i;
-                switch (iFix) {
-                    case 4:iFix = 5;
-                    break;
-                    case 5:iFix = 4;
-                }
+                iFix = switch (iFix) {
+                    case 4 -> 5;
+                    case 5 -> 4;
+                    default -> iFix;
+                };
                 if (slots.get(iFix).isEmpty()) {
                     ResourceLocation icon = this.getIconByIndex(iFix);
-                    guiGraphics.blit(icon, x, startY,
-                            0, 0,
-                            16, 16,
-                            16, 16);
-                };
+                    if (icon != null) {
+                        guiGraphics.blit(icon, x, startY,
+                                0, 0,
+                                16, 16,
+                                16, 16);
+                    }
+                }
             }
             x += 18;
 
@@ -132,9 +132,6 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
     }
     private void curiosRender(GuiGraphics guiGraphics) {
         if (!ModList.get().isLoaded("curios")) return;
-        final ResourceLocation CURIO_INVENTORY = new ResourceLocation(CuriosApi.MODID,
-                "textures/gui/inventory_revamp.png");
-        // 假设你已经有了获取目标实体的方法，并且这个实体支持Curios能力
         ICuriosItemHandler handler = this.menu.getTargetEntity().getCapability(CuriosCapability.INVENTORY).resolve().orElse(null);
         if (handler == null) return;
 
@@ -161,7 +158,7 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
                 ResourceLocation icon = CuriosApi.getSlot(identifier).get().getIcon();
                 if (icon != null) {
                     ResourceLocation newIcon = new ResourceLocation(icon.getNamespace(), "textures/"+icon.getPath()+".png");
-                    RenderSystem.setShaderTexture(0, newIcon);
+                    //RenderSystem.setShaderTexture(0, newIcon);
                     RenderSystem.setShaderTexture(0, CURIOS_TEX);
                     int x = startX - col * slotSize;
                     int y = startY + row * (slotSize + gap);
@@ -184,7 +181,7 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
 
     }
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         this.renderTooltip(guiGraphics, mouseX, mouseY);
@@ -192,59 +189,61 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
 
         int baseY = this.topPos + 20;
         int yOffset = 40;
-        /*
-        guiGraphics.drawString(this.font, Component.literal("护甲值"),
-                this.leftPos + 30, baseY, 0x000000, false);
-        guiGraphics.drawString(this.font, Component.literal("盔甲韧性"),
-                this.leftPos + 80, baseY, 0x000000, false);
-
-         */
         guiGraphics.drawString(this.font, Component.translatable("button.powerful_dummy.mobType"),
                 this.leftPos + 20, baseY + yOffset - 3 , 0x000000, false);
         guiGraphics.drawString(this.font, Component.translatable("button.powerful_dummy.attribute"),
                 this.leftPos + 20, baseY + 8 , 0x000000, false);
         guiGraphics.drawString(this.font, Component.translatable("button.powerful_dummy.value"),
                 this.leftPos + 65, baseY + 37 , 0x000000, false);
-        /*
-        guiGraphics.drawString(this.font, Component.translatable("button.powerful_dummy.change_mod_tip"),
-                this.leftPos + 59, baseY + yOffset - 3, 0x000000, false);
-         */
         renderDisplayAttributes(guiGraphics,this.menu.getTargetEntity());
 
 
     }
     private void renderDisplayAttributes(GuiGraphics guiGraphics, TestDummyEntity entity) {
-        ResourceLocation dataId =
-                new ResourceLocation(Powerful_dummy.MODID,"attribute_display");
+        ResourceLocation dataId = new ResourceLocation(Powerful_dummy.MODID, "attribute_display");
         AttributeData data = AttributeLoader.getData(dataId);
-        if (data != null && entity != null) {
-            int x = this.leftPos + 95;
-            int y = this.topPos + 24;
-            int offset = 3;
-            for (AttributeData.AttributeEntry entry : data.attributes) {
-                Attribute attribute = entry.getAttribute();
-                int displayColor = entry.getDisplayColor();
-                int valueColor = entry.getValueColor();
-                if (attribute != null) {
-                    double value = entity.getAttributeValue(attribute);
-                    String attributeText;
-                    String attributeValue;
-                    attributeText = Component.translatable(attribute.getDescriptionId()).getString()+":";
-                    if (entry.usePercent) {
-                        attributeValue = String.format("%.2f", value * 100);
-                    } else {
-                        attributeValue = String.format("%.2f", value);
-                    }
-                    guiGraphics.drawString(this.font, attributeText,
-                            x, y + offset, displayColor, false);
-                    offset += 1;
-                    y += this.font.lineHeight;
-                    guiGraphics.drawString(this.font, attributeValue,
-                            x, y + offset, valueColor, false);
-                    y += this.font.lineHeight;
-                    offset += 4;
-                }
+        if (data == null) {
+            // 可选：添加日志或调试输出
+            return;
+        }
+        if (entity == null) {
+            return;
+        }
+
+        int x = this.leftPos + 95;
+        int y = this.topPos + 24;
+        int offset = 3;
+        int lineHeight = this.font.lineHeight;
+
+        for (AttributeData.AttributeEntry entry : data.attributes) {
+            Attribute attribute = entry.getAttribute();
+            if (attribute == null) {
+                continue;
             }
+
+            double value = entity.getAttributeValue(attribute);
+            // 可选：对 value 进行有效性检查（如是否为 NaN 或 Infinite）
+
+            String attributeText = Component.translatable(attribute.getDescriptionId()).getString();
+            String formattedValue;
+            if (entry.usePercent) {
+                formattedValue = String.format("%.2f", value * 100);
+            } else {
+                formattedValue = String.format("%.2f", value);
+            }
+
+            // 使用 StringBuilder 避免多次字符串拼接
+            String fullText = new StringBuilder()
+                    .append(attributeText)
+                    .append(": ")
+                    .append(formattedValue)
+                    .toString();
+
+            guiGraphics.drawString(this.font, fullText, x, y + offset, entry.getDisplayColor(), false);
+
+            // 更新偏移量
+            offset += lineHeight + 5; // 原逻辑中 offset += 1 + 4，加上 lineHeight
+            y += lineHeight * 2;
         }
     }
 
@@ -322,32 +321,6 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
                 .size(73, 16)
                 .build();
         addRenderableWidget(applyAttributeButton);
-
-        // 切换模式按钮
-        /*
-        CustomFocusButton changeButton = CustomFocusButton.builder(
-                        Component.translatable("button.powerful_dummy.change_mode"),
-                        button -> {
-
-                        },
-                        attributeAutoCompleteBox)
-                .pos(Xpos + 39, this.topPos + 30 +36 )
-                .size(34, 20)
-                .build();
-        addRenderableWidget(changeButton);
-
-        addRenderableWidget(Button.builder(
-                        Component.translatable("button.powerful_dummy.close"),
-                        button -> {
-                            if (minecraft != null) {
-                                minecraft.setScreen(null);
-                            }
-                        })
-                .pos(this.leftPos+130, this.topPos + 90 )
-                .size(40, 20)
-                .build());
-
-         */
     }
 
 
@@ -366,9 +339,6 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (mobEffectAutoCompleteEditBox != null && mobEffectAutoCompleteEditBox.handleKeyPressed(keyCode,scanCode,modifiers)) {
-            return true;
-        }
         if (attributeAutoCompleteBox != null &&attributeAutoCompleteBox.handleKeyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }
@@ -379,9 +349,6 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
 
-        if (mobEffectAutoCompleteEditBox != null && mobEffectAutoCompleteEditBox.handleMouseClick(mouseX, mouseY)) {
-            return false;
-        }
         if (attributeAutoCompleteBox != null && attributeAutoCompleteBox.handleMouseClick(mouseX, mouseY)) {
             attributeAutoCompleteBox.setFocused(false);
             return false;
@@ -389,7 +356,9 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
         if (attributeAutoCompleteBox != null && attributeAutoCompleteBox.handleMouseClick(mouseX, mouseY)) {
             attributeAutoCompleteBox.setFocused(false);
         }
-        attributeAutoCompleteBox.setFocused(false);
+        if (attributeAutoCompleteBox != null) {
+            attributeAutoCompleteBox.setFocused(false);
+        }
         attributeInputField.setFocused(false);
         applyAttributeButton.setFocused(false);
         return super.mouseClicked(mouseX, mouseY, button);
@@ -397,9 +366,6 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-        if (mobEffectAutoCompleteEditBox != null && mobEffectAutoCompleteEditBox.mouseScrolled(mouseX, mouseY, delta)) {
-            return true;
-        }
         if (attributeAutoCompleteBox != null && attributeAutoCompleteBox.mouseScrolled(mouseX, mouseY, delta)) {
             return true;
         }
