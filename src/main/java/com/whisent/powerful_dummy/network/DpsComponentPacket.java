@@ -1,12 +1,10 @@
 package com.whisent.powerful_dummy.network;
 
 import com.whisent.powerful_dummy.Config;
-import com.whisent.powerful_dummy.Powerful_dummy;
 import com.whisent.powerful_dummy.client.DpsActionBar;
 import com.whisent.powerful_dummy.utils.DummyEventUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
