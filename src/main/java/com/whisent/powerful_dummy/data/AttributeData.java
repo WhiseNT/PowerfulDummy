@@ -1,8 +1,9 @@
 package com.whisent.powerful_dummy.data;
 
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 
@@ -15,8 +16,13 @@ public class AttributeData {
         public String valueColor;
 
         public Attribute getAttribute() {
-            return ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation(key));
+            return BuiltInRegistries.ATTRIBUTE.get(ResourceLocation.parse(key));
         }
+        public Holder<Attribute> getAttributeHolder() {
+            return BuiltInRegistries.ATTRIBUTE.getHolder(ResourceLocation.parse(key)).isPresent()
+                    ? BuiltInRegistries.ATTRIBUTE.getHolder(ResourceLocation.parse(key)).get() : null;
+        }
+
 
         public int getDisplayColor() {
             if (displayColor == null || displayColor.trim().isEmpty() || displayColor.equalsIgnoreCase("default")) {

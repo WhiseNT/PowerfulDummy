@@ -15,7 +15,7 @@ public class DamageTagData {
         public String displayColor;
 
         public ResourceKey<DamageType> getTag() {
-            return ResourceKey.create(Registries.DAMAGE_TYPE,new ResourceLocation(damageName));
+            return ResourceKey.create(Registries.DAMAGE_TYPE,ResourceLocation.parse(damageName));
         }
 
         public int getDisplayColor() {

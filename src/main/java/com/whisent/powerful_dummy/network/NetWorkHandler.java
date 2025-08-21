@@ -1,48 +1,58 @@
 package com.whisent.powerful_dummy.network;
 
 import com.whisent.powerful_dummy.Powerful_dummy;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
+
+
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public class NetWorkHandler {
-    private static final String PROTOCOL_VERSION = "1";
-    public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder.named(
-            new ResourceLocation(Powerful_dummy.MODID,"main"))
-            .serverAcceptedVersions((version) -> true)
-            .clientAcceptedVersions((version) -> true)
-            .networkProtocolVersion(() -> PROTOCOL_VERSION)
-            .simpleChannel();
+    public static void register(final RegisterPayloadHandlersEvent event) {
+        final PayloadRegistrar registrar = event.registrar(Powerful_dummy.MODID)
+                .versioned("1.0"); // 版本号
 
-    public static void register() {
-        int id = 0;
-        CHANNEL.messageBuilder(DummyInfoPacket.class,id)
-                .encoder(DummyInfoPacket::encode)
-                .decoder(DummyInfoPacket::decode)
-                .consumerMainThread(DummyInfoPacket::handle)
-                .add();
-        CHANNEL.messageBuilder(DpsComponentPacket.class, id+1)
-                .encoder(DpsComponentPacket::encode)
-                .decoder(DpsComponentPacket::decode)
-                .consumerMainThread(DpsComponentPacket::handle)
-                .add();
-        CHANNEL.messageBuilder(ClearDpsDataPacket.class, id+2)
-                .encoder(ClearDpsDataPacket::encode)
-                .decoder(ClearDpsDataPacket::decode)
-                .consumerMainThread(ClearDpsDataPacket::handle)
-                .add();
-        CHANNEL.messageBuilder(DamageDataPacket.class, id+3)
-                .encoder(DamageDataPacket::encode)
-                .decoder(DamageDataPacket::decode)
-                .consumerMainThread(DamageDataPacket::handle)
-                .add();
+        registrar.playToClient(
+                DpsComponentPacket.TYPE,
+                DpsComponentPacket.STREAM_CODEC,
+                DpsComponentPacket::handleClient
+        );
 
+        registrar.playToServer(
+                DummyInfoPacket.TYPE,
+                DummyInfoPacket.STREAM_CODEC,
+                DummyInfoPacket::handle
+        );
+
+        registrar.playToServer(
+                ClearDpsDataPacket.TYPE,
+                ClearDpsDataPacket.STREAM_CODEC,
+                ClearDpsDataPacket::handle
+        );
+
+        registrar.playToClient(
+                DamageDataPacket.TYPE,
+                DamageDataPacket.STREAM_CODEC,
+                DamageDataPacket::handle
+        );
+
+        // 如果需要客户端到客户端的通信，使用 playToClient
+        // registrar.playToClient(...)
     }
-    public static void sendToServer(Object msg) {
-        CHANNEL.send(PacketDistributor.SERVER.noArg(),msg);
+
+    public static void sendToServer(CustomPacketPayload payload) {
+        PacketDistributor.sendToServer(payload);
     }
-    public static void sendToAllClient(Object msg) {
-        CHANNEL.send(PacketDistributor.ALL.noArg(),msg);
+
+    public static void sendToClient(CustomPacketPayload payload, ServerPlayer player) {
+        PacketDistributor.sendToPlayer(player, payload);
+    }
+
+    public static void sendToAllClient(CustomPacketPayload payload) {
+        PacketDistributor.sendToAllPlayers(payload);
     }
 }

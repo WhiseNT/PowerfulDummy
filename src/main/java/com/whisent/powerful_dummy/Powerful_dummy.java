@@ -19,28 +19,32 @@ import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.settings.KeyConflictContext;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLLoader;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.settings.KeyConflictContext;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.registries.DeferredRegister;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
+
+import java.util.function.Supplier;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Powerful_dummy.MODID)
@@ -52,30 +56,36 @@ public class Powerful_dummy {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static EditBoxInfoHelper helper;
     @SuppressWarnings({"deprecation"})
-    public Powerful_dummy() {
+    public Powerful_dummy(IEventBus modEventBus) {
 
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+
         modEventBus.addListener(this::commonSetup);
 
         ItemRegistry.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
 
         MenuRegistry.register(modEventBus);
-        MinecraftForge.EVENT_BUS.register(this);
-        DummyEntityRegistry.register();
+        NeoForge.EVENT_BUS.register(this);
+        DummyEntityRegistry.register(modEventBus);
         modEventBus.addListener(EventPriority.NORMAL, false, EntityAttributeCreationEvent.class, event -> {
             event.put(DummyEntityRegistry.TEST_DUMMY.get(), TestDummyEntity.setAttributes());
         });
+        modEventBus.addListener(this::onModConfigEvent);
         new DpsActionBar();
-        KeyHandler.init();
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, PowerfulDummyConfig.SPEC);
+        PowerfulDummyConfig.register();
 
+    }
+    private void onModConfigEvent(final ModConfigEvent event) {
+        if (event.getConfig().getType() == ModConfig.Type.COMMON) {
+            // 重新加载配置
+            PowerfulDummyConfig.bake();
+        }
     }
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
-    public static final RegistryObject<CreativeModeTab> DUMMY_TAB = CREATIVE_MODE_TABS.register("creativetab_dummy",
-            ()->CreativeModeTab.builder()
-                    .icon(()->new ItemStack(ItemRegistry.DUMMY_STAND.get()))
+    public static final Supplier<CreativeModeTab> DUMMY_TAB = CREATIVE_MODE_TABS.register("creativetab_dummy",
+            () -> CreativeModeTab.builder()
+                    .icon(() -> new ItemStack(ItemRegistry.DUMMY_STAND.get()))
                     .title(Component.translatable("creativetab.powerful_dummy"))
                     .displayItems((itemDisplayParameters, output) -> {
                         output.accept(ItemRegistry.DUMMY_STAND.get());
@@ -89,9 +99,10 @@ public class Powerful_dummy {
                         .register(DummyEntityRegistry.TEST_DUMMY.get(), TestDummyRenderer::new);
 
             });
-            event.enqueueWork(NetWorkHandler::register);
         }
-
+    }
+    private void onRegisterNetwork (final RegisterPayloadHandlersEvent event) {
+        NetWorkHandler.register(event);
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
@@ -103,14 +114,12 @@ public class Powerful_dummy {
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @OnlyIn(Dist.CLIENT)
-    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = MODID, value = Dist.CLIENT)
     public static class ClientModEvents {
 
         @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event) {
-
-            MenuScreens.register(MenuRegistry.TEST_DUMMY_MENU.get(), TestDummyEntityScreen::new);
-
+        public static void onRegisterMenuScreens(RegisterMenuScreensEvent event) {
+            event.register(MenuRegistry.TEST_DUMMY_MENU.get(), TestDummyEntityScreen::new);
         }
         @SubscribeEvent
         public static void onRegisterLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {

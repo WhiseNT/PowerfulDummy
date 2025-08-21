@@ -1,33 +1,40 @@
 package com.whisent.powerful_dummy.network;
 
+import com.whisent.powerful_dummy.Powerful_dummy;
 import com.whisent.powerful_dummy.dps.DpsData;
 import com.whisent.powerful_dummy.dps.DpsTracker;
 import com.whisent.powerful_dummy.impl.IActionBarDisplay;
 import com.whisent.powerful_dummy.utils.DummyEventUtils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.function.Supplier;
 
-public class ClearDpsDataPacket {
+public class ClearDpsDataPacket implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<ClearDpsDataPacket> TYPE =
+            new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Powerful_dummy.MODID, "clear_dps_data"));
+    public static final StreamCodec<FriendlyByteBuf, ClearDpsDataPacket> STREAM_CODEC =
+            StreamCodec.of(ClearDpsDataPacket::encode, ClearDpsDataPacket::decode);
     private byte clear;
     public ClearDpsDataPacket(byte clear) {
         this.clear = clear;
     }
-    public void encode(FriendlyByteBuf buf) {
-        buf.writeByte(clear);
+    public static void encode(FriendlyByteBuf buf,ClearDpsDataPacket packet) {
+        buf.writeByte(packet.clear);
     }
     public static ClearDpsDataPacket decode(FriendlyByteBuf buf) {
         return new ClearDpsDataPacket(buf.readByte());
     }
-    public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        context.enqueueWork(() -> {
-            if (context.getDirection().getReceptionSide().isServer()) {
+    public void handle(IPayloadContext contextSupplier) {
+        contextSupplier.enqueueWork(() -> {
+            if (contextSupplier.connection().getDirection().getReceptionSide().isServer()) {
 
-                Player player = context.getSender();
+                Player player = contextSupplier.player();
                 if (player == null) return;
                 DpsTracker.getDpsData(player).reset();
                 ((IActionBarDisplay)player)
@@ -36,9 +43,11 @@ public class ClearDpsDataPacket {
             } else {
                 System.out.print("客户端");
             }
-
         });
-        context.setPacketHandled(true);
     }
 
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
 }

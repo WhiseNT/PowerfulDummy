@@ -11,11 +11,15 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.ModList;
+
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
+import net.neoforged.neoforge.network.IContainerFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
@@ -49,6 +53,8 @@ public class TestDummyEntityMenu extends AbstractContainerMenu {
         }
 
     }
+
+
 
     private static TestDummyEntity getEntityFromBuf(FriendlyByteBuf buf, Level level) {
         int entityId = buf.readInt();
@@ -247,6 +253,10 @@ public class TestDummyEntityMenu extends AbstractContainerMenu {
     }
     public TestDummyCuriosContainer getCuriosContainer() {
         return curiosContainer;
+    }
+
+    public static MenuType<TestDummyEntityMenu> createMenuType() {
+        return IMenuTypeExtension.create(TestDummyEntityMenu::new);
     }
 }
 

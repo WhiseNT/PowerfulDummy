@@ -29,9 +29,10 @@ public abstract class AbstractAutoCompleteEditBox extends EditBox {
         this.SUGGESTIONS_VISIBLE_COUNT = count;
     };
     public abstract void loadSuggestions();
+
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
         PoseStack poseStack = guiGraphics.pose();
         RenderSystem.enableBlend();
         poseStack.pushPose();

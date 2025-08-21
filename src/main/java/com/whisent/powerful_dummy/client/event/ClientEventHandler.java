@@ -5,14 +5,13 @@ import com.whisent.powerful_dummy.network.ClearDpsDataPacket;
 import com.whisent.powerful_dummy.network.NetWorkHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.InputEvent;
 
 
-@Mod.EventBusSubscriber(modid = Powerful_dummy.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE,value = { Dist.CLIENT })
+@EventBusSubscriber(modid = Powerful_dummy.MODID,value = { Dist.CLIENT })
 public class ClientEventHandler {
 
     @SubscribeEvent
@@ -24,10 +23,6 @@ public class ClientEventHandler {
                 NetWorkHandler.sendToServer(new ClearDpsDataPacket(clear));
             }
         }
-    }
-    @SubscribeEvent
-    public static void onOverlay(RenderGuiOverlayEvent event) {
-        
     }
 
 

@@ -3,6 +3,7 @@ package com.whisent.powerful_dummy.gui.widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
@@ -40,9 +41,9 @@ public class AttributeAutoCompleteEditBox extends AbstractAutoCompleteEditBox {
             RegistryAccess registryAccess = Minecraft.getInstance().level.registryAccess();
             Registry<Attribute> attributeRegistry = registryAccess.registryOrThrow(Registries.ATTRIBUTE);
             for (ResourceLocation key : attributeRegistry.keySet()) {
-                Attribute attribute = attributeRegistry.get(key);
+                Holder<Attribute> attribute = attributeRegistry.getHolder(key).get();
                 if (attribute != null && getEntity().getAttribute(attribute) != null) {
-                    String name = Component.translatable(attribute.getDescriptionId()).getString();
+                    String name = Component.translatable(attribute.value().getDescriptionId()).getString();
                     if (getEntity().getAttribute(attribute).getBaseValue() != 0.0D) {
                         suggestions.add(name);
                         attributesNotZero.putIfAbsent(name,true);

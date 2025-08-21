@@ -1,29 +1,27 @@
 package com.whisent.powerful_dummy.entity;
 
 import com.whisent.powerful_dummy.Powerful_dummy;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.function.Supplier;
+
 
 public class DummyEntityRegistry {
-    // 使用 DeferredRegister 注册实体类型
-    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
-            DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, Powerful_dummy.MODID); // 替换为你的模组 ID
-    // 注册 TestDummyEntity 实体类型
-    public static final RegistryObject<EntityType<TestDummyEntity>> TEST_DUMMY =
-            ENTITY_TYPES.register("test_dummy",
-            () -> EntityType.Builder.of(TestDummyEntity::new, MobCategory.MONSTER)
-                    .sized(0.6f, 2.7f) // 设置实体尺寸（宽度, 高度）
-                    .clientTrackingRange(10)
-                    .build(new ResourceLocation("powerful_dummy:test_dummy").toString())
-                    );
-    // 注册到模组事件总线
-    @SuppressWarnings({"deprecation"})
-    public static void register() {
-        ENTITY_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
+    public static final DeferredRegister<EntityType<?>> ENTITIES =
+            DeferredRegister.create(Registries.ENTITY_TYPE, Powerful_dummy.MODID);
+
+    // 使用 Supplier<EntityType<?>> 而不是 RegistryObject<EntityType<?>>
+    public static final Supplier<EntityType<TestDummyEntity>> TEST_DUMMY = ENTITIES.register("test_dummy",
+            () -> EntityType.Builder.of(TestDummyEntity::new, MobCategory.MISC)
+                    .sized(0.6F, 1.8F)
+                    .build("test_dummy"));
+
+    public static void register(IEventBus bus) {
+        ENTITIES.register(bus);
     }
 }

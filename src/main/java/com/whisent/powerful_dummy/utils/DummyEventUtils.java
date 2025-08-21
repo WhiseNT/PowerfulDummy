@@ -14,7 +14,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.PacketDistributor;
+
 
 public class DummyEventUtils {
     public static void updateDpsMessages(Level level) {
@@ -35,8 +35,7 @@ public class DummyEventUtils {
 
             //((IActionBarDisplay)player).sendActionBarMessage(finalText);
             DpsComponentPacket packet = new DpsComponentPacket(damage, dps, total, data.getDamageDataList().size(), color);
-            NetWorkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(
-                    () -> player), packet);
+            NetWorkHandler.sendToClient(packet,player);
 
 
             //NetWorkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);

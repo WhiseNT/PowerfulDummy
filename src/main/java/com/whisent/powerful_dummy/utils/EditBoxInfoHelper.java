@@ -1,6 +1,7 @@
 package com.whisent.powerful_dummy.utils;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
@@ -18,7 +19,7 @@ public class EditBoxInfoHelper {
     }
     // 状态变量
     private final Minecraft minecraft = Minecraft.getInstance();
-    private HashMap<String, HashMap<String, Attribute>> attributesMap = new HashMap<>();
+    private HashMap<String, HashMap<String, Holder<Attribute>>> attributesMap = new HashMap<>();
     private String lastLoadedLang;
 
     // 私有构造器（确保外部无法 new）
@@ -46,23 +47,23 @@ public class EditBoxInfoHelper {
         return minecraft;
     }
 
-    public HashMap<String, HashMap<String, Attribute>> getAttributesMap() {
+    public HashMap<String, HashMap<String, Holder<Attribute>>> getAttributesMap() {
         ensureInitialized();
         return attributesMap;
     }
 
-    public HashMap<String, Attribute> getAttributesByLang(String langCode) {
+    public HashMap<String, Holder<Attribute>> getAttributesByLang(String langCode) {
         ensureInitialized();
         return getAttributesMap().getOrDefault(langCode, new HashMap<>());
     }
 
-    public Attribute getAttributeByDescriptionName(String name) {
+    public Holder<Attribute> getAttributeByDescriptionName(String name) {
         ensureInitialized();
         return getAttributesInSelected().getOrDefault(name.toLowerCase(Locale.ROOT), null);
     }
 
 
-    public HashMap<String, Attribute> getAttributesInSelected() {
+    public HashMap<String, Holder<Attribute>> getAttributesInSelected() {
         ensureInitialized();
         return getAttributesByLang(getCurrentLanguage());
     }
@@ -76,20 +77,20 @@ public class EditBoxInfoHelper {
         String currentLang = getCurrentLanguage();
 
         for (ResourceLocation key : attributeRegistry.keySet()) {
-            Attribute attribute = attributeRegistry.get(key);
+            Holder<Attribute> attribute = attributeRegistry.getHolder(key).get();
             if (attribute == null) continue;
 
-            String localizedName = Component.translatable(attribute.getDescriptionId()).getString();
+            String localizedName = Component.translatable(attribute.value().getDescriptionId()).getString();
             attributesMap.computeIfAbsent(currentLang, k -> new HashMap<>())
                     .put(localizedName.toLowerCase(Locale.ROOT), attribute);
         }
     }
 
-    public Optional<Attribute> findAttributeByName(String inputName) {
+    public Optional<Holder<Attribute>> findAttributeByName(String inputName) {
         if (inputName == null || inputName.isEmpty()) return Optional.empty();
         ensureInitialized();
         String lowerInput = inputName.toLowerCase(Locale.ROOT);
-        Map<String, Attribute> attrMap = getAttributesInSelected();
+        Map<String, Holder<Attribute>> attrMap = getAttributesInSelected();
         return attrMap.entrySet().stream()
                 .filter(entry -> entry.getKey().contains(lowerInput))
                 .map(Map.Entry::getValue)
@@ -117,13 +118,13 @@ public class EditBoxInfoHelper {
         }
 
         Registry<Attribute> attributeRegistry = getMinecraft().level.registryAccess().registryOrThrow(Registries.ATTRIBUTE);
-        HashMap<String, Attribute> langMap = new HashMap<>();
+        HashMap<String, Holder<Attribute>> langMap = new HashMap<>();
 
         for (ResourceLocation key : attributeRegistry.keySet()) {
-            Attribute attribute = attributeRegistry.get(key);
+            Holder<Attribute> attribute = attributeRegistry.getHolder(key).get();
             if (attribute == null) continue;
 
-            String localizedName = Component.translatable(attribute.getDescriptionId()).getString();
+            String localizedName = Component.translatable(attribute.value().getDescriptionId()).getString();
             langMap.put(localizedName.toLowerCase(Locale.ROOT), attribute);
         }
 
@@ -132,11 +133,13 @@ public class EditBoxInfoHelper {
     public ResourceLocation getAttributeResourceLocationByName(String attributeName) {
         ensureInitialized(); // 确保数据是最新的
         // 获取当前语言环境下的属性映射
-        HashMap<String, Attribute> attributesInSelectedLang = getAttributesInSelected();
+        HashMap<String, Holder<Attribute>> attributesInSelectedLang = getAttributesInSelected();
         // 查找与给定名称匹配的属性
-        for (Map.Entry<String, Attribute> entry : attributesInSelectedLang.entrySet()) {
+        for (Map.Entry<String, Holder<Attribute>> entry : attributesInSelectedLang.entrySet()) {
             if (entry.getKey().equalsIgnoreCase(attributeName)) {
-                return minecraft.level.registryAccess().registryOrThrow(Registries.ATTRIBUTE).getKey(entry.getValue());
+                return minecraft.level.registryAccess()
+                        .registryOrThrow(Registries.ATTRIBUTE)
+                        .getKey(entry.getValue().value());
             }
         }
 

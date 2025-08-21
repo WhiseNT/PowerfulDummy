@@ -6,6 +6,8 @@ import com.whisent.powerful_dummy.impl.IActionBarDisplay;
 import com.whisent.powerful_dummy.item.ItemRegistry;
 import com.whisent.powerful_dummy.utils.Debugger;
 import com.whisent.powerful_dummy.utils.DummyEventUtils;
+import com.whisent.powerful_dummy.utils.MobTypeHelper;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -18,6 +20,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -28,14 +31,15 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.network.NetworkHooks;
+import net.neoforged.fml.ModList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CuriosCapability;
 
+import java.util.Objects;
+
 public class TestDummyEntity extends Mob {
-    public MobType mobType;
+    public MobTypeHelper.MobTypeEnum mobType;
     public Player lastInteractPlayer;
 
     private final SimpleContainer inventory = new SimpleContainer(4);
@@ -46,7 +50,7 @@ public class TestDummyEntity extends Mob {
         this.setCanPickUpLoot(false);
         this.setInvulnerable(false);
         this.setPersistenceRequired();
-        this.mobType = MobType.UNDEFINED;
+        this.mobType = MobTypeHelper.MobTypeEnum.UNDEFINED;
         if (!this.level().isClientSide) {
             Debugger.sendDebugMessage("[TestDummyEntity] Created new dummy at position: " + blockPosition());
         }
@@ -84,7 +88,7 @@ public class TestDummyEntity extends Mob {
                 Debugger.sendDebugMessage("[TestDummyEntity] Opening menu for player: " + player.getName().getString());
                 lastInteractPlayer = player;
                 if (player.getMainHandItem().isEmpty()) {
-                    NetworkHooks.openScreen((ServerPlayer)player, new SimpleMenuProvider(
+                    player.openMenu(new SimpleMenuProvider(
                             (id,inventory,p)->new TestDummyEntityMenu(id,inventory,this),
                             Component.translatable("gui.test.title")
                     ),friendlyByteBuf -> {
@@ -108,11 +112,11 @@ public class TestDummyEntity extends Mob {
             }
         });
         if (ModList.get().isLoaded( "curios")) {
-            if (this.getCapability(CuriosCapability.INVENTORY).resolve().isEmpty()) return;
-            int amount = this.getCapability(CuriosCapability.INVENTORY).resolve().get()
+            if (this.getCapability(CuriosCapability.INVENTORY) == null) return;
+            int amount = Objects.requireNonNull(this.getCapability(CuriosCapability.INVENTORY))
                     .getEquippedCurios().getSlots();
             for (int i = 0; i < amount; i++) {
-                ItemStack itemStack = this.getCapability(CuriosCapability.INVENTORY).resolve().get()
+                ItemStack itemStack = this.getCapability(CuriosCapability.INVENTORY)
                         .getEquippedCurios().getStackInSlot(i);
                 if (!itemStack.isEmpty()) {
                     Block.popResource(this.level(),this.blockPosition(),itemStack);
@@ -214,11 +218,10 @@ public class TestDummyEntity extends Mob {
     public SimpleContainer getInventory() {
         return this.inventory;
     }
-    @Override
-    public MobType getMobType() {
+    public MobTypeHelper.MobTypeEnum getMobType() {
         return mobType;
     }
-    public void setMobType(MobType type) {
+    public void setMobType(MobTypeHelper.MobTypeEnum type) {
         this.mobType = type;
     }
 

@@ -17,9 +17,9 @@ public class TestDummyCuriosContainer extends SimpleContainer {
     private final HashMap<String, ArrayList<Integer>> identifierMap = new HashMap<>();
 
     public TestDummyCuriosContainer(TestDummyEntity entity) {
-        super(entity.getCapability(CuriosCapability.INVENTORY).resolve().get().getSlots());
+        super(entity.getCapability(CuriosCapability.INVENTORY).getSlots());
         this.entity = entity;
-        this.curiosItemHandler = getCuriosHandler().orElseThrow(() -> new IllegalStateException("Curios not available for this entity"));
+        this.curiosItemHandler = getCuriosHandler();
         init ();
     }
     private void init () {
@@ -35,10 +35,10 @@ public class TestDummyCuriosContainer extends SimpleContainer {
 
         }
         //System.out.println(identifierMap);
-        var inv = entity.getCapability(CuriosCapability.INVENTORY).resolve();
+        var inv = entity.getCapability(CuriosCapability.INVENTORY);
         for (int i = 0; i < this.curiosItemHandler.getCurios().size(); i++) {
             String identifier = identifierList.get(i);
-            setItem(i,inv.get().getCurios().get(identifier).getStacks()
+            setItem(i,inv.getCurios().get(identifier).getStacks()
                     .getStackInSlot(getIdentifierIndex(identifier,i)));
 
         }
@@ -98,8 +98,8 @@ public class TestDummyCuriosContainer extends SimpleContainer {
         return identifierMap.get(identifier).indexOf(index);
     }
 
-    private Optional<ICuriosItemHandler> getCuriosHandler() {
-        return entity.getCapability(CuriosCapability.INVENTORY).resolve();
+    private ICuriosItemHandler getCuriosHandler() {
+        return entity.getCapability(CuriosCapability.INVENTORY);
     }
 
 

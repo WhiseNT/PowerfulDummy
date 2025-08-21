@@ -6,20 +6,18 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderGuiEvent;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
+
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-@Mod.EventBusSubscriber(modid = Powerful_dummy.MODID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Powerful_dummy.MODID, value = Dist.CLIENT)
 public class DpsActionBar {
     // 使用AtomicReference确保线程安全
     private static final AtomicReference<ClientDummyData> currentData = new AtomicReference<>();
@@ -34,8 +32,8 @@ public class DpsActionBar {
     }
 
     @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END && currentData.get() != null) {
+    public static void onClientTick(ClientTickEvent.Post event) {
+        if (currentData.get() != null) {
             if (++ticksVisible >= MAX_VISIBLE_TICKS) {
                 currentData.set(null);
                 damageHistory.clean();
