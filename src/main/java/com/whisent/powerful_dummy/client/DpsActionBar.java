@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGuiEvent;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
@@ -75,12 +76,26 @@ public class DpsActionBar {
         int lineHeight = mc.font.lineHeight;
         int totalHeight = lineHeight * 3 + 6;
 
-        drawScaledString(gui, mc.font, String.format("%.1f 秒伤", data.dps()),x, y,0xFFFFFF, 2f);
-
-        gui.drawString(mc.font, String.format("%.1f 总伤", data.totalDamage()),
-                x , y + 24,0xFFFFFF, true);
-        gui.drawString(mc.font, String.format("%.1f 单次伤害", data.damage()),
-                x , y + 36,baseColor, true);
+        String dpsValue = String.format("%.1f", data.dps());
+        String totalDamageValue = String.format("%.1f", data.totalDamage());
+        String damagePerHitValue = String.format("%.1f", data.damage());
+        // 渲染标签文本
+        drawScaledString(gui, mc.font,
+                Component.translatable("gui.powerful_dummy.stats.dps")
+                        .append(" ")
+                        .append(dpsValue).getString(),
+                x, y, 0xFFFFFF, 2f);
+        gui.drawString(mc.font,
+                Component.translatable("gui.powerful_dummy.stats.total_damage")
+                        .append(" ")
+                        .append(totalDamageValue)
+                        .getString(),
+                x, y + 24, 0xFFFFFF, true);
+        gui.drawString(mc.font, Component.translatable("gui.powerful_dummy.stats.damage_per_hit")
+                        .append(" ")
+                        .append(damagePerHitValue)
+                        .getString(),
+                x, y + 36, baseColor, true);
 
 
         // 绘制连击计数

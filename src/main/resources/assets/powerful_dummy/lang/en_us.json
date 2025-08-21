@@ -34,6 +34,10 @@
 
   "key.categories.powerful_dummy": "Powerful Dummy",
   "key.powerful_dummy.cleardps": "Clear Dps",
-  "powerful_dummy.dps.cleared": "DpsData has cleared"
+  "powerful_dummy.dps.cleared": "DpsData has cleared",
+
+  "gui.powerful_dummy.stats.dps": "DPS",
+  "gui.powerful_dummy.stats.total_damage": "Total Damage",
+  "gui.powerful_dummy.stats.damage_per_hit": "Damage"
 
 }

@@ -68,7 +68,7 @@ public class Powerful_dummy {
         });
         new DpsActionBar();
         KeyHandler.init();
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, PowerfulDummyConfig.SPEC);
 
     }
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =

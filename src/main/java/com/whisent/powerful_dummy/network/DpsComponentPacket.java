@@ -1,6 +1,6 @@
 package com.whisent.powerful_dummy.network;
 
-import com.whisent.powerful_dummy.Config;
+import com.whisent.powerful_dummy.PowerfulDummyConfig;
 import com.whisent.powerful_dummy.client.DpsActionBar;
 import com.whisent.powerful_dummy.utils.DummyEventUtils;
 import net.minecraft.client.Minecraft;
@@ -39,7 +39,7 @@ public class DpsComponentPacket {
     public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
         contextSupplier.get().enqueueWork(()->{
            if (contextSupplier.get().getDirection().getReceptionSide().isClient()) {
-               if (!Config.useActionbarToShowData) {
+               if (!PowerfulDummyConfig.useActionbarToShowData) {
                    DpsActionBar.displayText(damage, dps, totalDamage, combo, color);
                } else {
                    Minecraft minecraft = Minecraft.getInstance();

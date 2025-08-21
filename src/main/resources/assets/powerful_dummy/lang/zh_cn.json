@@ -34,5 +34,9 @@
 
   "key.categories.powerful_dummy": "强力假人",
   "key.powerful_dummy.cleardps": "清除伤害数据",
-  "powerful_dummy.dps.cleared": "已清除伤害数据"
+  "powerful_dummy.dps.cleared": "已清除伤害数据",
+
+  "gui.powerful_dummy.stats.dps": "秒伤",
+  "gui.powerful_dummy.stats.total_damage": "总伤",
+  "gui.powerful_dummy.stats.damage_per_hit": "单次伤害"
 }
