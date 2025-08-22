@@ -7,21 +7,29 @@ import net.minecraft.resources.ResourceLocation;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
-public class NetWorkHandler {
-    public static void register(final RegisterPayloadHandlersEvent event) {
-        final PayloadRegistrar registrar = event.registrar(Powerful_dummy.MODID)
-                .versioned("1.0"); // 版本号
 
+public class NetWorkHandler {
+
+    public static void register(final RegisterPayloadHandlersEvent event) {
+        System.out.println("=== POWERFUL_DUMMY: Registering network payloads ===");
+
+        final PayloadRegistrar registrar = event.registrar("1.0");
+
+        // 注册 DPS 组件包（服务器 -> 客户端）
+        System.out.println("Registering DpsComponentPacket for client...");
         registrar.playToClient(
                 DpsComponentPacket.TYPE,
                 DpsComponentPacket.STREAM_CODEC,
-                DpsComponentPacket::handleClient
+                ClientPayloadHandler::handleDataOnMain
         );
 
+        // 注册其他包...
         registrar.playToServer(
                 DummyInfoPacket.TYPE,
                 DummyInfoPacket.STREAM_CODEC,
@@ -38,10 +46,10 @@ public class NetWorkHandler {
                 DamageDataPacket.TYPE,
                 DamageDataPacket.STREAM_CODEC,
                 DamageDataPacket::handle
+                // 客户端处理器在 RegisterClientPayloadHandlersEvent 中注册
         );
 
-        // 如果需要客户端到客户端的通信，使用 playToClient
-        // registrar.playToClient(...)
+        System.out.println("=== POWERFUL_DUMMY: Network registration complete ===");
     }
 
     public static void sendToServer(CustomPacketPayload payload) {

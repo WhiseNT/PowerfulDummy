@@ -101,9 +101,6 @@ public class Powerful_dummy {
             });
         }
     }
-    private void onRegisterNetwork (final RegisterPayloadHandlersEvent event) {
-        NetWorkHandler.register(event);
-    }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
