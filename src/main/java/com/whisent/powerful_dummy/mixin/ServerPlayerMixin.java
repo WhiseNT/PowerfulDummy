@@ -2,8 +2,6 @@ package com.whisent.powerful_dummy.mixin;
 
 import com.whisent.powerful_dummy.impl.IActionBarDisplay;
 import com.whisent.powerful_dummy.network.DamageDataPacket;
-import com.whisent.powerful_dummy.network.DpsComponentPacket;
-import com.whisent.powerful_dummy.network.NetWorkHandler;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.server.level.ServerPlayer;
