@@ -1,35 +1,29 @@
 package com.whisent.powerful_dummy.entity;
 
-import com.whisent.powerful_dummy.dps.DpsTracker;
 import com.whisent.powerful_dummy.gui.TestDummyEntityMenu;
-import com.whisent.powerful_dummy.impl.IActionBarDisplay;
 import com.whisent.powerful_dummy.item.ItemRegistry;
 import com.whisent.powerful_dummy.utils.Debugger;
-import com.whisent.powerful_dummy.utils.DummyEventUtils;
 import com.whisent.powerful_dummy.utils.MobTypeHelper;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -40,9 +34,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CuriosCapability;
 
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 public class TestDummyEntity extends Mob {
     public MobTypeHelper.MobTypeEnum mobType;

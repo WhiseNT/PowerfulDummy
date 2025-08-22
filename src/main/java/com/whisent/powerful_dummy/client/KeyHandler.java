@@ -3,12 +3,10 @@ package com.whisent.powerful_dummy.client;
 
 import com.whisent.powerful_dummy.Powerful_dummy;
 import net.minecraft.client.Minecraft;
-
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.common.NeoForge;
 
 @EventBusSubscriber(modid = Powerful_dummy.MODID,value = { Dist.CLIENT })
 public class KeyHandler {

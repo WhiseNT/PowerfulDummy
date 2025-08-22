@@ -8,7 +8,6 @@ import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Optional;
 
 public class TestDummyCuriosContainer extends SimpleContainer {
     private final TestDummyEntity entity;

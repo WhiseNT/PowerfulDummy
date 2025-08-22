@@ -1,19 +1,17 @@
 package com.whisent.powerful_dummy.events;
 
 import com.whisent.powerful_dummy.Powerful_dummy;
-import com.whisent.powerful_dummy.entity.TestDummyEntity;
 import com.whisent.powerful_dummy.dps.DpsTracker;
+import com.whisent.powerful_dummy.entity.TestDummyEntity;
 import com.whisent.powerful_dummy.impl.IActionBarDisplay;
 import com.whisent.powerful_dummy.utils.Debugger;
 import com.whisent.powerful_dummy.utils.DummyEventUtils;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;

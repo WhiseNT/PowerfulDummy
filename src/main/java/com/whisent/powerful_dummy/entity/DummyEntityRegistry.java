@@ -2,7 +2,6 @@ package com.whisent.powerful_dummy.entity;
 
 import com.whisent.powerful_dummy.Powerful_dummy;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.neoforged.bus.api.IEventBus;

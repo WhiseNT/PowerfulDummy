@@ -1,9 +1,7 @@
 package com.whisent.powerful_dummy.network;
 
-import com.whisent.powerful_dummy.Powerful_dummy;
 import com.whisent.powerful_dummy.client.DpsActionBar;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;

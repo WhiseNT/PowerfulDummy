@@ -3,7 +3,6 @@ package com.whisent.powerful_dummy.utils;
 
 import net.minecraft.network.chat.Component;
 
-
 import java.util.*;
 
 public class MobTypeHelper {
