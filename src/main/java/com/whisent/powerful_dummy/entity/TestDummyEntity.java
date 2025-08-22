@@ -8,8 +8,12 @@ import com.whisent.powerful_dummy.utils.Debugger;
 import com.whisent.powerful_dummy.utils.DummyEventUtils;
 import com.whisent.powerful_dummy.utils.MobTypeHelper;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,7 +40,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CuriosCapability;
 
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 public class TestDummyEntity extends Mob {
     public MobTypeHelper.MobTypeEnum mobType;
@@ -50,7 +56,7 @@ public class TestDummyEntity extends Mob {
         this.setCanPickUpLoot(false);
         this.setInvulnerable(false);
         this.setPersistenceRequired();
-        this.mobType = MobTypeHelper.MobTypeEnum.UNDEFINED;
+        this.mobType = initMobType(entityType);
         if (!this.level().isClientSide) {
             Debugger.sendDebugMessage("[TestDummyEntity] Created new dummy at position: " + blockPosition());
         }
@@ -103,6 +109,20 @@ public class TestDummyEntity extends Mob {
         }
 
         return super.interactAt(player, pos, hand);
+    }
+    private MobTypeHelper.MobTypeEnum initMobType(EntityType<? extends TestDummyEntity> entityType) {
+        if (DummyEntityRegistry.TEST_DUMMY.get() == entityType) {
+            return MobTypeHelper.MobTypeEnum.UNDEFINED;
+        } else if (DummyEntityRegistry.TEST_DUMMY_UNDEAD.get() == entityType) {
+            return MobTypeHelper.MobTypeEnum.UNDEAD;
+        } else if (DummyEntityRegistry.TEST_DUMMY_WATER.get() == entityType) {
+            return MobTypeHelper.MobTypeEnum.WATER;
+        } else if (DummyEntityRegistry.TEST_DUMMY_ARTHROPOD.get() == entityType) {
+            return MobTypeHelper.MobTypeEnum.ARTHROPOD;
+        } else if (DummyEntityRegistry.TEST_DUMMY_ILLAGER.get() == entityType) {
+            return MobTypeHelper.MobTypeEnum.ILLAGER;
+        }
+        return MobTypeHelper.MobTypeEnum.UNDEFINED;
     }
     public void popEquipmentSlots () {
         this.getAllSlots().forEach(itemStack -> {
@@ -167,46 +187,9 @@ public class TestDummyEntity extends Mob {
 
     @Override
     protected void actuallyHurt(@NotNull DamageSource source, float damage) {
-        if (!this.level().isClientSide()) {
-            if (source == null) return;
-
-            String entityName = "null";
-            String damageSourceMsgId = "null";
-
-            var entity = source.getEntity();
-            if (entity != null) {
-                var name = entity.getName();
-                if (name != null) {
-                    entityName = name.getString();
-                }
-            }
-
-            var msgId = source.getMsgId();
-            if (msgId != null) {
-                damageSourceMsgId = msgId;
-            }
-
-            Debugger.sendDebugMessage(String.format("[TestDummyEntity] Actually hurt by: %s | Damage: %f | Source: %s",
-                    damageSourceMsgId, damage, entityName));
-
-            Player player = null;
-            if (entity instanceof Player) {
-                player = (Player) entity;
-                this.setLastInteractPlayer(player);
-                DpsTracker.onEntityDamage(source, damage);
-            } else {
-                player = this.getLastInteractPlayer();
-                if (player != null) {
-                    DpsTracker.onEntityDamage(source, player, damage);
-                }
-            }
-
-            if (player instanceof ServerPlayer serverPlayer) {
-                DummyEventUtils.sendHurtMessage(serverPlayer);
-                ((IActionBarDisplay)player).powerfulDummy$sendDamage(damage, false);
-            }
-        }
         super.actuallyHurt(source, damage);
+
+
     }
 
 
@@ -223,6 +206,29 @@ public class TestDummyEntity extends Mob {
     }
     public void setMobType(MobTypeHelper.MobTypeEnum type) {
         this.mobType = type;
+        switch ( type) {
+            case UNDEFINED -> switchMobType(DummyEntityRegistry.TEST_DUMMY.get());
+            case UNDEAD -> switchMobType(DummyEntityRegistry.TEST_DUMMY_UNDEAD.get());
+            case ILLAGER -> switchMobType(DummyEntityRegistry.TEST_DUMMY_ILLAGER.get());
+            case WATER -> switchMobType(DummyEntityRegistry.TEST_DUMMY_WATER.get());
+            case ARTHROPOD -> switchMobType(DummyEntityRegistry.TEST_DUMMY_ARTHROPOD.get());
+        }
+    }
+    private void switchMobType(EntityType<? extends TestDummyEntity> type) {
+        TestDummyEntity newEntity = new TestDummyEntity(type, this.level());
+        newEntity.getAttributes()
+                .getAttributesToSync()
+                .forEach(attribute -> attribute.setBaseValue(Objects.requireNonNull(this.getAttribute(attribute.getAttribute())).getBaseValue()));
+        newEntity.lastInteractPlayer = this.lastInteractPlayer;
+        newEntity.lastHurt = this.lastHurt;
+        newEntity.lastHurtByPlayer = this.lastHurtByPlayer;
+        newEntity.setPos(this.getX(), this.getY(), this.getZ());
+        newEntity.setRot(this.getYRot(), this.getXRot());
+        CompoundTag nbt  = new CompoundTag();
+        this.saveWithoutId(nbt);
+        newEntity.load(nbt);
+        this.discard();
+        this.level().addFreshEntity(newEntity);
     }
 
     public void kill() {
@@ -241,12 +247,16 @@ public class TestDummyEntity extends Mob {
         }
     }
 
-
+    int tickcounter = 0;
     @Override
     public void tick() {
         super.tick();
         if (this.getHealth() < this.getMaxHealth()) {
             this.heal(this.getMaxHealth() - this.getHealth()); // 仅在需要时恢复
+        }
+        tickcounter++;
+        if (tickcounter % 20 == 0) {
+            //System.out.println(this.getArmorSlots());
         }
     }
 
@@ -296,4 +306,9 @@ public class TestDummyEntity extends Mob {
     public @Nullable LivingEntity getLastHurtByMob() {
         return super.getLastHurtByMob();
     }
+
+
+
+
+
 }

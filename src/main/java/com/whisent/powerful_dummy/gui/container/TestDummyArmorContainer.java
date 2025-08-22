@@ -5,6 +5,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class TestDummyArmorContainer extends SimpleContainer {
     private final TestDummyEntity entity;
@@ -51,7 +52,7 @@ public class TestDummyArmorContainer extends SimpleContainer {
 
 
     @Override
-    public ItemStack removeItem(int index, int count) {
+    public @NotNull ItemStack removeItem(int index, int count) {
         ItemStack stack = super.removeItem(index, count);
         return stack;
     }
@@ -61,5 +62,6 @@ public class TestDummyArmorContainer extends SimpleContainer {
         ItemStack stack = super.removeItemNoUpdate(index);
         return stack;
     }
+
 
 }

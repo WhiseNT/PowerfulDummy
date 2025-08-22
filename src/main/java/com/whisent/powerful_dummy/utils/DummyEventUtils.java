@@ -14,6 +14,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 
 public class DummyEventUtils {
@@ -35,7 +36,7 @@ public class DummyEventUtils {
 
             //((IActionBarDisplay)player).sendActionBarMessage(finalText);
             DpsComponentPacket packet = new DpsComponentPacket(damage, dps, total, data.getDamageDataList().size(), color);
-            NetWorkHandler.sendToClient(packet,player);
+            PacketDistributor.sendToPlayer(player, packet);
 
 
             //NetWorkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);

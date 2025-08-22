@@ -52,10 +52,7 @@ public class Powerful_dummy {
 
     // Define mod id in a common place for everything to reference
     public static final String MODID = "powerful_dummy";
-    public static final String DUMMY_ID = "test_dummy";
     public static final Logger LOGGER = LogUtils.getLogger();
-    public static EditBoxInfoHelper helper;
-    @SuppressWarnings({"deprecation"})
     public Powerful_dummy(IEventBus modEventBus) {
 
 
@@ -69,6 +66,11 @@ public class Powerful_dummy {
         DummyEntityRegistry.register(modEventBus);
         modEventBus.addListener(EventPriority.NORMAL, false, EntityAttributeCreationEvent.class, event -> {
             event.put(DummyEntityRegistry.TEST_DUMMY.get(), TestDummyEntity.setAttributes());
+            event.put(DummyEntityRegistry.TEST_DUMMY_UNDEAD.get(), TestDummyEntity.setAttributes());
+            event.put(DummyEntityRegistry.TEST_DUMMY_ILLAGER.get(), TestDummyEntity.setAttributes());
+            event.put(DummyEntityRegistry.TEST_DUMMY_WATER.get(), TestDummyEntity.setAttributes());
+            event.put(DummyEntityRegistry.TEST_DUMMY_ARTHROPOD.get(), TestDummyEntity.setAttributes());
+
         });
         modEventBus.addListener(this::onModConfigEvent);
         new DpsActionBar();
@@ -95,8 +97,17 @@ public class Powerful_dummy {
     private void commonSetup(final FMLCommonSetupEvent event) {
         if (FMLLoader.getDist().isClient()) {
             event.enqueueWork(() -> {
-                EntityRenderers
-                        .register(DummyEntityRegistry.TEST_DUMMY.get(), TestDummyRenderer::new);
+                EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY.get(),
+                                TestDummyRenderer::new);
+                EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY_UNDEAD.get(),
+                            TestDummyRenderer::new);
+                EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY_ARTHROPOD.get(),
+                                TestDummyRenderer::new);
+                EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY_WATER.get(),
+                                TestDummyRenderer::new);
+                EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY_ILLAGER.get(),
+                        TestDummyRenderer::new);
+
 
             });
         }

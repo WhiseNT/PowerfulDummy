@@ -129,21 +129,24 @@ public abstract class AbstractAutoCompleteEditBox extends EditBox {
         }
         return false;
     }
-    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         if (!isFocused()) return false;
 
         List<String> filtered = getSuggestions(getValue());
         if (!filtered.isEmpty()) {
             int maxScrollOffset = Math.max(0, filtered.size() - SUGGESTIONS_VISIBLE_COUNT);
-            if (delta < 0) { // 向下滚动
+            if (scrollY < 0) { // 向下滚动
                 scrollOffset = Math.min(scrollOffset + 1, maxScrollOffset);
-            } else if (delta > 0) { // 向上滚动
+            } else if (scrollY > 0) { // 向上滚动
                 scrollOffset = Math.max(0, scrollOffset - 1);
             }
             return true;
         }
         return false;
     }
+
 
     @Override
     public boolean charTyped(char codePoint, int modifiers) {

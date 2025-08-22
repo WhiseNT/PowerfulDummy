@@ -42,7 +42,7 @@ public class AttributeAutoCompleteEditBox extends AbstractAutoCompleteEditBox {
             Registry<Attribute> attributeRegistry = registryAccess.registryOrThrow(Registries.ATTRIBUTE);
             for (ResourceLocation key : attributeRegistry.keySet()) {
                 Holder<Attribute> attribute = attributeRegistry.getHolder(key).get();
-                if (attribute != null && getEntity().getAttribute(attribute) != null) {
+                if (getEntity().getAttribute(attribute) != null) {
                     String name = Component.translatable(attribute.value().getDescriptionId()).getString();
                     if (getEntity().getAttribute(attribute).getBaseValue() != 0.0D) {
                         suggestions.add(name);
@@ -86,7 +86,7 @@ public class AttributeAutoCompleteEditBox extends AbstractAutoCompleteEditBox {
                 guiGraphics.fill(x, y + i * 12, x + width, y + (i + 1) * 12, 0xB0555555);
             }
             String finalSuggestion;
-            int maxWidth = 88;
+            int maxWidth = 62;
             if (font.width(suggestion) > maxWidth) {
                 finalSuggestion = font.plainSubstrByWidth(suggestion, maxWidth) + "..";
             } else {

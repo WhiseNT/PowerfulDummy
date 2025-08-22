@@ -19,7 +19,6 @@ import net.minecraft.world.level.Level;
 
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
-import net.neoforged.neoforge.network.IContainerFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;

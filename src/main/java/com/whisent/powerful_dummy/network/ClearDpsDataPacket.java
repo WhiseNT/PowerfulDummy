@@ -1,53 +1,50 @@
 package com.whisent.powerful_dummy.network;
 
 import com.whisent.powerful_dummy.Powerful_dummy;
-import com.whisent.powerful_dummy.dps.DpsData;
 import com.whisent.powerful_dummy.dps.DpsTracker;
 import com.whisent.powerful_dummy.impl.IActionBarDisplay;
-import com.whisent.powerful_dummy.utils.DummyEventUtils;
-import net.minecraft.network.FriendlyByteBuf;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import java.util.function.Supplier;
+public record ClearDpsDataPacket(byte clear) implements CustomPacketPayload {
+    public static final Type<ClearDpsDataPacket> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath("powerful_dummy", "clear_dps_data"));
 
-public class ClearDpsDataPacket implements CustomPacketPayload {
-    public static final CustomPacketPayload.Type<ClearDpsDataPacket> TYPE =
-            new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Powerful_dummy.MODID, "clear_dps_data"));
-    public static final StreamCodec<FriendlyByteBuf, ClearDpsDataPacket> STREAM_CODEC =
-            StreamCodec.of(ClearDpsDataPacket::encode, ClearDpsDataPacket::decode);
-    private byte clear;
-    public ClearDpsDataPacket(byte clear) {
-        this.clear = clear;
-    }
-    public static void encode(FriendlyByteBuf buf,ClearDpsDataPacket packet) {
-        buf.writeByte(packet.clear);
-    }
-    public static ClearDpsDataPacket decode(FriendlyByteBuf buf) {
-        return new ClearDpsDataPacket(buf.readByte());
-    }
-    public void handle(IPayloadContext contextSupplier) {
-        contextSupplier.enqueueWork(() -> {
-            if (contextSupplier.connection().getDirection().getReceptionSide().isServer()) {
-
-                Player player = contextSupplier.player();
-                if (player == null) return;
-                DpsTracker.getDpsData(player).reset();
-                ((IActionBarDisplay)player)
-                        .sendActionBarMessage(Component.translatable("powerful_dummy.dps.cleared"));
-
-            } else {
-                System.out.print("客户端");
-            }
-        });
-    }
+    public static final StreamCodec<ByteBuf, ClearDpsDataPacket> STREAM_CODEC =
+            StreamCodec.composite(
+                    ByteBufCodecs.BYTE, ClearDpsDataPacket::clear,
+                    ClearDpsDataPacket::new
+            );
 
     @Override
     public Type<? extends CustomPacketPayload> type() {
         return TYPE;
+    }
+
+    public void handle(IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.connection().getDirection().getReceptionSide().isServer()) {
+                // 服务器端处理
+                Player player = context.player();
+                if (player != null) {
+                    DpsTracker.getDpsData(player).reset();
+                    if (player instanceof IActionBarDisplay actionBarDisplay) {
+                        actionBarDisplay.sendActionBarMessage(Component.translatable("powerful_dummy.dps.cleared"));
+                    }
+                }
+            } else {
+                // 客户端处理
+                System.out.print("客户端收到清空DPS数据包");
+            }
+        }).exceptionally(e -> {
+            Powerful_dummy.LOGGER.error("Failed to handle ClearDpsDataPacket", e);
+            return null;
+        });
     }
 }

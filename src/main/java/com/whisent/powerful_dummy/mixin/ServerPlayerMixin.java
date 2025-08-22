@@ -7,6 +7,7 @@ import com.whisent.powerful_dummy.network.NetWorkHandler;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(ServerPlayer.class)
@@ -24,7 +25,7 @@ public class ServerPlayerMixin implements IActionBarDisplay {
     public void powerfulDummy$sendDamage(double damage, boolean flag) {
         if (((ServerPlayer)(Object)this).connection != null) { // 确保连接存在
             DamageDataPacket packet2 = new DamageDataPacket(damage,false);
-            NetWorkHandler.sendToClient(packet2,(ServerPlayer)(Object)this);
+            PacketDistributor.sendToPlayer((ServerPlayer)(Object)this, packet2);
         }
     }
 
