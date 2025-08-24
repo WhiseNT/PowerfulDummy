@@ -2,6 +2,7 @@ package com.whisent.powerful_dummy.network;
 
 import com.whisent.powerful_dummy.Powerful_dummy;
 import com.whisent.powerful_dummy.entity.TestDummyEntity;
+import com.whisent.powerful_dummy.utils.Debugger;
 import com.whisent.powerful_dummy.utils.MobTypeHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
@@ -68,7 +69,6 @@ public class DummyInfoPacket implements CustomPacketPayload {
         if (entity instanceof TestDummyEntity testDummy && !testDummy.isRemoved()) {
             // 更新假人属性
 
-
             for (String attributeKey : this.map.getAllKeys()) {
                 try {
                     ResourceLocation rl = ResourceLocation.parse(attributeKey);
@@ -83,6 +83,7 @@ public class DummyInfoPacket implements CustomPacketPayload {
                 }
             }
             testDummy.setMobType(MobTypeHelper.fromId(this.mobTypeId));
+
             PacketDistributor.sendToAllPlayers(new DummyInfoPacket(
                     testDummy.getId(),
                     MobTypeHelper.toId(testDummy.getMobType()),

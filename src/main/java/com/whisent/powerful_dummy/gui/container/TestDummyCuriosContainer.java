@@ -14,72 +14,72 @@ public class TestDummyCuriosContainer extends SimpleContainer {
     private final ICuriosItemHandler curiosItemHandler;
     private final ArrayList<String> identifierList = new ArrayList<>();
     private final HashMap<String, ArrayList<Integer>> identifierMap = new HashMap<>();
+    private final HashMap<Integer, Integer> slotIndexToIdentifierIndexMap = new HashMap<>();
 
     public TestDummyCuriosContainer(TestDummyEntity entity) {
         super(entity.getCapability(CuriosCapability.INVENTORY).getSlots());
         this.entity = entity;
         this.curiosItemHandler = getCuriosHandler();
-        init ();
+        init();
     }
-    private void init () {
+
+    private void init() {
         int index = 0;
-        for (var entry : curiosItemHandler.getCurios().values()) {
-            int identifierAmount = curiosItemHandler.getCurios().get(entry.getIdentifier()).getSlots();
+        var curiosMap = curiosItemHandler.getCurios();
+        if (curiosMap == null) return;
+
+        for (var entry : curiosMap.values()) {
+            String identifier = entry.getIdentifier();
+            int identifierAmount = entry.getSlots();
+            identifierMap.putIfAbsent(identifier, new ArrayList<>());
             for (int i = 0; i < identifierAmount; i++) {
-                identifierList.add(entry.getIdentifier());
-                identifierMap.putIfAbsent(entry.getIdentifier(), new ArrayList<>());
-                identifierMap.get(entry.getIdentifier()).add(index);
+                identifierList.add(identifier);
+                identifierMap.get(identifier).add(index);
+                slotIndexToIdentifierIndexMap.put(index, i);
                 index++;
             }
-
         }
-        //System.out.println(identifierMap);
+
         var inv = entity.getCapability(CuriosCapability.INVENTORY);
-        for (int i = 0; i < this.curiosItemHandler.getCurios().size(); i++) {
+        if (inv == null) return;
+
+        for (int i = 0; i < this.getContainerSize(); i++) {
             String identifier = identifierList.get(i);
-            setItem(i,inv.getCurios().get(identifier).getStacks()
-                    .getStackInSlot(getIdentifierIndex(identifier,i)));
-
+            var stacks = inv.getCurios().get(identifier);
+            if (stacks != null) {
+                int identifierIndex = slotIndexToIdentifierIndexMap.get(i);
+                setItem(i, stacks.getStacks().getStackInSlot(identifierIndex));
+            }
         }
-
     }
+
     @Override
     public void setItem(int index, ItemStack itemStack) {
         super.setItem(index, itemStack);
+        if (index >= identifierList.size()) return;
+
         String itemIdentifier = identifierList.get(index);
-        //System.out.println(itemStack);
+        var curiosMap = curiosItemHandler.getCurios();
+        if (curiosMap == null) return;
+
+        var curioStacks = curiosMap.get(itemIdentifier);
+        if (curioStacks == null) return;
+
+        int identifierIndex = slotIndexToIdentifierIndexMap.get(index);
+        var stacks = curioStacks.getStacks();
+
         if (!itemStack.isEmpty()) {
-            if (curiosItemHandler.getCurios().get(itemIdentifier).getStacks()
-                    .getStackInSlot(getIdentifierIndex(itemIdentifier,index)).isEmpty()) {
-                curiosItemHandler.getCurios().get(itemIdentifier).getStacks()
-                        .insertItem(getIdentifierIndex(itemIdentifier,index),itemStack,false);
+            if (stacks.getStackInSlot(identifierIndex).isEmpty()) {
+                stacks.insertItem(identifierIndex, itemStack, false);
             }
-
-            }else {
-            curiosItemHandler.getCurios().get(itemIdentifier).getStacks()
-                    .insertItem(getIdentifierIndex(itemIdentifier,index),ItemStack.EMPTY,false);
-        }
-
-        /*
-        if (!itemStack.isEmpty()) {
-            curiosItemHandler.getCurios().values().stream().filter(i -> i.getIdentifier().equals(itemIdentifier)).findFirst().ifPresent(i -> {
-                if (i.getStacks().getStackInSlot(getIdentifierIndex(i.getIdentifier(),index)).isEmpty()) {
-                    i.getStacks().insertItem(getIdentifierIndex(i.getIdentifier(),index),itemStack,false);
-                }
-            });
         } else {
-            curiosItemHandler.getCurios().values().stream().filter(i -> i.getIdentifier().equals(itemIdentifier)).findFirst().ifPresent(i -> {
-                i.getStacks().insertItem(getIdentifierIndex(i.getIdentifier(),index), ItemStack.EMPTY,false);
-            });
+            stacks.insertItem(identifierIndex, ItemStack.EMPTY, false);
         }
-         */
-
     }
+
     @Override
     public ItemStack removeItem(int index, int count) {
         ItemStack stack = super.removeItem(index, count);
-        //this.setItem(index,getItem(index));
-
         return stack;
     }
 
@@ -87,23 +87,24 @@ public class TestDummyCuriosContainer extends SimpleContainer {
         return identifierList;
     }
 
-    public String getIdentifier (int index) {
+    public String getIdentifier(int index) {
         if (index >= identifierList.size()) {
             return null;
         }
         return identifierList.get(index);
     }
-    public Integer getIdentifierIndex (String identifier,int index) {
-        return identifierMap.get(identifier).indexOf(index);
+
+    public Integer getIdentifierIndex(String identifier, int slotIndex) {
+        var list = identifierMap.get(identifier);
+        if (list == null) return -1;
+        int identifierIndex = list.indexOf(slotIndex);
+        return identifierIndex == -1 ? -1 : identifierIndex;
     }
 
     private ICuriosItemHandler getCuriosHandler() {
         return entity.getCapability(CuriosCapability.INVENTORY);
     }
 
-
-
-    // 辅助方法：获取 Curios Handler
     public ICuriosItemHandler getCuriosHandlerRaw() {
         return curiosItemHandler;
     }

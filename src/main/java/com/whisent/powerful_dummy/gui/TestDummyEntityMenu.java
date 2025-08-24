@@ -226,6 +226,7 @@ public class TestDummyEntityMenu extends AbstractContainerMenu {
         int slotIndex = 0;
         int startX = -5;
         int startY = 8;
+        if (curiosContainer.getCuriosHandlerRaw().getSlots() < 1) return;
         for (int i = 0; i < curiosContainer.getCuriosHandlerRaw().getSlots(); i++) {
             if (i != 0 && i % 10 == 0) {
                 startX -= 18;

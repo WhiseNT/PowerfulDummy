@@ -3,14 +3,6 @@
     "powerful_dummy:test_dummy"
   ],
   "slots": [
-    "back",
-    "body",
-    "belt",
-    "bracelet",
-    "charm",
-    "hands",
-    "head",
-    "necklace",
-    "ring"
+    "dummy_curio"
   ]
 }

@@ -60,11 +60,14 @@ public class Powerful_dummy {
         DummyEntityRegistry.register(modEventBus);
         modEventBus.addListener(EventPriority.NORMAL, false, EntityAttributeCreationEvent.class, event -> {
             event.put(DummyEntityRegistry.TEST_DUMMY.get(), TestDummyEntity.setAttributes());
+            /*
             event.put(DummyEntityRegistry.TEST_DUMMY_UNDEAD.get(), TestDummyEntity.setAttributes());
             event.put(DummyEntityRegistry.TEST_DUMMY_ILLAGER.get(), TestDummyEntity.setAttributes());
             event.put(DummyEntityRegistry.TEST_DUMMY_WATER.get(), TestDummyEntity.setAttributes());
             event.put(DummyEntityRegistry.TEST_DUMMY_ARTHROPOD.get(), TestDummyEntity.setAttributes());
 
+
+             */
         });
         modEventBus.addListener(this::onModConfigEvent);
         new DpsActionBar();
@@ -93,6 +96,7 @@ public class Powerful_dummy {
             event.enqueueWork(() -> {
                 EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY.get(),
                                 TestDummyRenderer::new);
+                /*
                 EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY_UNDEAD.get(),
                             TestDummyRenderer::new);
                 EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY_ARTHROPOD.get(),
@@ -101,6 +105,8 @@ public class Powerful_dummy {
                                 TestDummyRenderer::new);
                 EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY_ILLAGER.get(),
                         TestDummyRenderer::new);
+
+                 */
 
 
             });

@@ -1,0 +1,5 @@
+{
+  "order": 1000,
+  "size": 8,
+  "validators": ["curios:all"]
+}

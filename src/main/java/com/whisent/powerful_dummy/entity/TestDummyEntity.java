@@ -32,7 +32,9 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
+import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
 import java.util.Objects;
 
@@ -105,7 +107,7 @@ public class TestDummyEntity extends Mob {
     private MobTypeHelper.MobTypeEnum initMobType(EntityType<? extends TestDummyEntity> entityType) {
         if (DummyEntityRegistry.TEST_DUMMY.get() == entityType) {
             return MobTypeHelper.MobTypeEnum.UNDEFINED;
-        } else if (DummyEntityRegistry.TEST_DUMMY_UNDEAD.get() == entityType) {
+        } /* else if (DummyEntityRegistry.TEST_DUMMY_UNDEAD.get() == entityType) {
             return MobTypeHelper.MobTypeEnum.UNDEAD;
         } else if (DummyEntityRegistry.TEST_DUMMY_WATER.get() == entityType) {
             return MobTypeHelper.MobTypeEnum.WATER;
@@ -113,7 +115,7 @@ public class TestDummyEntity extends Mob {
             return MobTypeHelper.MobTypeEnum.ARTHROPOD;
         } else if (DummyEntityRegistry.TEST_DUMMY_ILLAGER.get() == entityType) {
             return MobTypeHelper.MobTypeEnum.ILLAGER;
-        }
+        } */
         return MobTypeHelper.MobTypeEnum.UNDEFINED;
     }
     public void popEquipmentSlots () {
@@ -197,14 +199,21 @@ public class TestDummyEntity extends Mob {
         return mobType;
     }
     public void setMobType(MobTypeHelper.MobTypeEnum type) {
-        this.mobType = type;
-        switch ( type) {
-            case UNDEFINED -> switchMobType(DummyEntityRegistry.TEST_DUMMY.get());
-            case UNDEAD -> switchMobType(DummyEntityRegistry.TEST_DUMMY_UNDEAD.get());
-            case ILLAGER -> switchMobType(DummyEntityRegistry.TEST_DUMMY_ILLAGER.get());
-            case WATER -> switchMobType(DummyEntityRegistry.TEST_DUMMY_WATER.get());
-            case ARTHROPOD -> switchMobType(DummyEntityRegistry.TEST_DUMMY_ARTHROPOD.get());
+        if (this.mobType != type) {
+            this.mobType = type;
+
+            /*
+            switch (type) {
+                case UNDEFINED -> switchMobType(DummyEntityRegistry.TEST_DUMMY.get());
+                case UNDEAD -> switchMobType(DummyEntityRegistry.TEST_DUMMY_UNDEAD.get());
+                case ILLAGER -> switchMobType(DummyEntityRegistry.TEST_DUMMY_ILLAGER.get());
+                case WATER -> switchMobType(DummyEntityRegistry.TEST_DUMMY_WATER.get());
+                case ARTHROPOD -> switchMobType(DummyEntityRegistry.TEST_DUMMY_ARTHROPOD.get());
+            }
+
+             */
         }
+
     }
     private void switchMobType(EntityType<? extends TestDummyEntity> type) {
         TestDummyEntity newEntity = new TestDummyEntity(type, this.level());
@@ -216,11 +225,18 @@ public class TestDummyEntity extends Mob {
         newEntity.lastHurtByPlayer = this.lastHurtByPlayer;
         newEntity.setPos(this.getX(), this.getY(), this.getZ());
         newEntity.setRot(this.getYRot(), this.getXRot());
+
         CompoundTag nbt  = new CompoundTag();
         this.saveWithoutId(nbt);
         newEntity.load(nbt);
         this.discard();
+        ICuriosItemHandler oldDummyCurios = CuriosApi.getCuriosInventory(this).orElse(null);
+        ICuriosItemHandler newDummyCurios = CuriosApi.getCuriosInventory(newEntity).orElse(null);
+        if (oldDummyCurios != null && newDummyCurios != null) {
+            newDummyCurios.setCurios(oldDummyCurios.getCurios());
+        }
         this.level().addFreshEntity(newEntity);
+
     }
 
     public void kill() {

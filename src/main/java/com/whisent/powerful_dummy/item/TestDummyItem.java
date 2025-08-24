@@ -13,7 +13,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.fml.ModList;
 import org.jetbrains.annotations.NotNull;
+import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.type.capability.ICurioItem;
+import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
+
+import java.util.Map;
 
 public class TestDummyItem extends Item {
     public TestDummyItem(Properties p_41383_) {
@@ -38,6 +44,7 @@ public class TestDummyItem extends Item {
                 dummy.moveTo(dummy.getX(), dummy.getY(), dummy.getZ(), alignedYaw, 0.0F);
                 dummy.setYHeadRot(alignedYaw);
                 dummy.setYBodyRot(alignedYaw);
+
                 level.addFreshEntity(dummy);
                 level.playSound(null, dummy.getX(), dummy.getY(), dummy.getZ(),
                         SoundEvents.ARMOR_STAND_PLACE, SoundSource.BLOCKS, 0.75F, 0.8F);

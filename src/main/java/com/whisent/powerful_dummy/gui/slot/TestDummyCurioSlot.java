@@ -6,6 +6,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import top.theillusivec4.curios.api.CuriosApi;
 
 public class TestDummyCurioSlot extends Slot {
     private final Container container;
@@ -23,7 +24,7 @@ public class TestDummyCurioSlot extends Slot {
 
     @Override
     public boolean mayPlace(ItemStack itemStack) {
-        if (true) {
+        if (CuriosApi.getCurio(itemStack).isPresent()) {
             TestDummyCuriosContainer curiosContainer = (TestDummyCuriosContainer) container;
 
             //能否装入空物品槽
