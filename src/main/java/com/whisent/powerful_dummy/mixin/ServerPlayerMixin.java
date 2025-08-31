@@ -23,11 +23,14 @@ public class ServerPlayerMixin implements IActionBarDisplay {
 
     @Override
     public void powerfulDummy$sendDamage(double damage, boolean flag) {
+        /*
         if (((ServerPlayer)(Object)this).connection != null) { // 确保连接存在
             DamageDataPacket packet2 = new DamageDataPacket(damage,false);
             NetWorkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(
                     () -> ((ServerPlayer)(Object)this)), packet2);
         }
+
+         */
     }
 
 }

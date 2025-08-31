@@ -1,9 +1,8 @@
 package com.whisent.powerful_dummy.network;
 
-import com.whisent.powerful_dummy.dps.DpsData;
+
 import com.whisent.powerful_dummy.dps.DpsTracker;
 import com.whisent.powerful_dummy.impl.IActionBarDisplay;
-import com.whisent.powerful_dummy.utils.DummyEventUtils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;

@@ -6,11 +6,11 @@ import com.whisent.powerful_dummy.network.NetWorkHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-
 
 @Mod.EventBusSubscriber(modid = Powerful_dummy.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE,value = { Dist.CLIENT })
 public class ClientEventHandler {
@@ -25,10 +25,5 @@ public class ClientEventHandler {
             }
         }
     }
-    @SubscribeEvent
-    public static void onOverlay(RenderGuiOverlayEvent event) {
-        
-    }
-
 
 }

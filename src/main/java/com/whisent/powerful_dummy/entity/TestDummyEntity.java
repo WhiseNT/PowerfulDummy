@@ -163,46 +163,9 @@ public class TestDummyEntity extends Mob {
 
     @Override
     protected void actuallyHurt(@NotNull DamageSource source, float damage) {
-        if (!this.level().isClientSide()) {
-            if (source == null) return;
-
-            String entityName = "null";
-            String damageSourceMsgId = "null";
-
-            var entity = source.getEntity();
-            if (entity != null) {
-                var name = entity.getName();
-                if (name != null) {
-                    entityName = name.getString();
-                }
-            }
-
-            var msgId = source.getMsgId();
-            if (msgId != null) {
-                damageSourceMsgId = msgId;
-            }
-
-            Debugger.sendDebugMessage(String.format("[TestDummyEntity] Actually hurt by: %s | Damage: %f | Source: %s",
-                    damageSourceMsgId, damage, entityName));
-
-            Player player = null;
-            if (entity instanceof Player) {
-                player = (Player) entity;
-                this.setLastInteractPlayer(player);
-                DpsTracker.onEntityDamage(source, damage);
-            } else {
-                player = this.getLastInteractPlayer();
-                if (player != null) {
-                    DpsTracker.onEntityDamage(source, player, damage);
-                }
-            }
-
-            if (player instanceof ServerPlayer serverPlayer) {
-                DummyEventUtils.sendHurtMessage(serverPlayer);
-                ((IActionBarDisplay)player).powerfulDummy$sendDamage(damage, false);
-            }
-        }
         super.actuallyHurt(source, damage);
+
+
     }
 
 

@@ -24,9 +24,9 @@ public class DamageDataPacket {
         contextSupplier.get().enqueueWork(() -> {
             if (contextSupplier.get().getDirection().getReceptionSide().isClient()) {
                 if (flag) {
-                    DpsActionBar.getDamageHistory().clean();
+                    //DpsActionBar.getDamageHistory().clean();
                 } else {
-                    DpsActionBar.getDamageHistory().addDamage(amount);
+                    //DpsActionBar.getDamageHistory().addDamage(amount);
                 }
             }
         });

@@ -32,11 +32,14 @@ public class NetWorkHandler {
                 .decoder(ClearDpsDataPacket::decode)
                 .consumerMainThread(ClearDpsDataPacket::handle)
                 .add();
+        /*
         CHANNEL.messageBuilder(DamageDataPacket.class, id+3)
                 .encoder(DamageDataPacket::encode)
                 .decoder(DamageDataPacket::decode)
                 .consumerMainThread(DamageDataPacket::handle)
                 .add();
+
+         */
 
     }
     public static void sendToServer(Object msg) {

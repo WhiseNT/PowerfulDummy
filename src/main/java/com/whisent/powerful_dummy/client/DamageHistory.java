@@ -1,5 +1,8 @@
 package com.whisent.powerful_dummy.client;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+
 import java.util.ArrayDeque;
 import java.util.Queue;
 

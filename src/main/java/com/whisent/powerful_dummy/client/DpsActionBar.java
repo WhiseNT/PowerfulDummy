@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class DpsActionBar {
     // 使用AtomicReference确保线程安全
     private static final AtomicReference<ClientDummyData> currentData = new AtomicReference<>();
-    private static final DamageHistory damageHistory = new DamageHistory();
     private static volatile int ticksVisible = 0;
     private static final int FADE_TICKS = 10;
     private static final int STAY_TICKS = 30;
@@ -38,7 +37,6 @@ public class DpsActionBar {
         if (event.phase == TickEvent.Phase.END && currentData.get() != null) {
             if (++ticksVisible >= MAX_VISIBLE_TICKS) {
                 currentData.set(null);
-                damageHistory.clean();
             }
         }
     }
@@ -75,8 +73,11 @@ public class DpsActionBar {
         // 计算文字总高度
         int lineHeight = mc.font.lineHeight;
         int totalHeight = lineHeight * 3 + 6;
-
-        String dpsValue = String.format("%.1f", data.dps());
+        double dps = data.dps();
+        if (data.dps() == 0) {
+            dps = data.totalDamage();
+        }
+        String dpsValue = String.format("%.1f",dps);
         String totalDamageValue = String.format("%.1f", data.totalDamage());
         String damagePerHitValue = String.format("%.1f", data.damage());
         // 渲染标签文本
@@ -118,7 +119,4 @@ public class DpsActionBar {
         gui.pose().popPose();
     }
 
-    public static DamageHistory getDamageHistory() {
-        return damageHistory;
-    }
 }

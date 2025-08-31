@@ -3,8 +3,11 @@ package com.whisent.powerful_dummy.events;
 import com.whisent.powerful_dummy.Powerful_dummy;
 import com.whisent.powerful_dummy.entity.TestDummyEntity;
 import com.whisent.powerful_dummy.dps.DpsTracker;
+import com.whisent.powerful_dummy.impl.IActionBarDisplay;
+import com.whisent.powerful_dummy.utils.Debugger;
 import com.whisent.powerful_dummy.utils.DummyEventUtils;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -20,35 +23,50 @@ import net.minecraftforge.fml.common.Mod;
 public class ServerEventsHandler {
     @SubscribeEvent
     public static void onDamageEvent(LivingDamageEvent event) {
-        /*
-        Entity entity = event.getEntity();
-        if (!entity.level().isClientSide() && entity instanceof TestDummyEntity) {
-            //System.out.println("hurt");
-            double damage = event.getAmount();
-            Entity source = event.getSource().getEntity();
-            if (source instanceof Player) {
-                ((TestDummyEntity) entity).setLastInteractPlayer((Player) source);
-                DpsTracker.onEntityDamage(event.getSource(),damage);
-                DummyEventUtils.sendHurtMessage((ServerPlayer) source);;
-            } else {
-                Player player = ((TestDummyEntity) entity).getLastInteractPlayer();
-                if (player != null) {
-                    DpsTracker.onEntityDamage(event.getSource(), player,damage);
-                    DummyEventUtils.sendHurtMessage((ServerPlayer) player);
+        DamageSource source = event.getSource();
+        double damage = event.getAmount();
+        if (event.getEntity() instanceof TestDummyEntity dummy) {
+            if (!dummy.level().isClientSide()) {
+                if (source == null) return;
+
+                String entityName = "null";
+                String damageSourceMsgId = "null";
+
+                var entity = source.getEntity();
+                if (entity != null) {
+                    var name = entity.getName();
+                    if (name != null) {
+                        entityName = name.getString();
+                    }
                 }
 
+                var msgId = source.getMsgId();
+                if (msgId != null) {
+                    damageSourceMsgId = msgId;
+                }
+
+                Debugger.sendDebugMessage(String.format("[TestDummyEntity] Actually hurt by: %s | Damage: %f | Source: %s",
+                        damageSourceMsgId, damage, entityName));
+
+                Player player = null;
+                if (entity instanceof Player) {
+                    player = (Player) entity;
+                    dummy.setLastInteractPlayer(player);
+                    DpsTracker.onEntityDamage(source, damage);
+                } else {
+                    player = dummy.getLastInteractPlayer();
+                    if (player != null) {
+                        DpsTracker.onEntityDamage(source, player, damage);
+                    }
+                }
+
+                if (player instanceof ServerPlayer serverPlayer) {
+                    DummyEventUtils.sendHurtMessage(serverPlayer);
+                    ((IActionBarDisplay) player).powerfulDummy$sendDamage(damage, false);
+                }
             }
         }
-        */
-    }
-    @SubscribeEvent
-    public static void onAttackEvent(LivingAttackEvent event) {
-        Entity entity = event.getEntity();
-        //System.out.println("触发攻击");
-    }
-    @SubscribeEvent
-    public static void onHurtEvent(LivingHurtEvent event) {
-        //System.out.println("受伤");
+
     }
     private static final int TICK_INTERVAL = 40;
     private static int tickCounter = 0;

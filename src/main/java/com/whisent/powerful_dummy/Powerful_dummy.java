@@ -12,7 +12,6 @@ import com.whisent.powerful_dummy.gui.MenuRegistry;
 import com.whisent.powerful_dummy.gui.TestDummyEntityScreen;
 import com.whisent.powerful_dummy.item.ItemRegistry;
 import com.whisent.powerful_dummy.network.NetWorkHandler;
-import com.whisent.powerful_dummy.utils.EditBoxInfoHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -48,9 +47,7 @@ public class Powerful_dummy {
 
     // Define mod id in a common place for everything to reference
     public static final String MODID = "powerful_dummy";
-    public static final String DUMMY_ID = "test_dummy";
     public static final Logger LOGGER = LogUtils.getLogger();
-    public static EditBoxInfoHelper helper;
     @SuppressWarnings({"deprecation"})
     public Powerful_dummy() {
 
@@ -66,8 +63,7 @@ public class Powerful_dummy {
         modEventBus.addListener(EventPriority.NORMAL, false, EntityAttributeCreationEvent.class, event -> {
             event.put(DummyEntityRegistry.TEST_DUMMY.get(), TestDummyEntity.setAttributes());
         });
-        new DpsActionBar();
-        KeyHandler.init();
+
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, PowerfulDummyConfig.SPEC);
 
     }
@@ -83,13 +79,13 @@ public class Powerful_dummy {
                     .build());
 
     private void commonSetup(final FMLCommonSetupEvent event) {
+        event.enqueueWork(NetWorkHandler::register);
+
+        // 客户端专用注册应该只在客户端执行
         if (FMLLoader.getDist().isClient()) {
             event.enqueueWork(() -> {
-                EntityRenderers
-                        .register(DummyEntityRegistry.TEST_DUMMY.get(), TestDummyRenderer::new);
-
+                EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY.get(), TestDummyRenderer::new);
             });
-            event.enqueueWork(NetWorkHandler::register);
         }
 
     }
@@ -108,7 +104,7 @@ public class Powerful_dummy {
 
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
-
+            KeyHandler.init();
             MenuScreens.register(MenuRegistry.TEST_DUMMY_MENU.get(), TestDummyEntityScreen::new);
 
         }
@@ -125,6 +121,7 @@ public class Powerful_dummy {
         @SubscribeEvent
         public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
             event.register(ClientModEvents.CLEAR_DPS_DATA);
+            new DpsActionBar();
         }
 
     }

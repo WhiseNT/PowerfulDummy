@@ -12,6 +12,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -59,6 +61,15 @@ public class DummyInfoPacket {
                     ));
                 }
             } else {
+                handleClient(contextSupplier);
+            }
+        });
+
+    }
+    @OnlyIn(Dist.CLIENT)
+    public void handleClient(Supplier<NetworkEvent.Context> contextSupplier) {
+        contextSupplier.get().enqueueWork(() -> {
+            if (contextSupplier.get().getDirection().getReceptionSide().isClient()) {
                 Minecraft mc = Minecraft.getInstance();
                 Level world = mc.level;
                 if (world != null) {
@@ -76,7 +87,6 @@ public class DummyInfoPacket {
                 }
             }
         });
-
     }
     public static DummyInfoPacket decode(FriendlyByteBuf buf) {
         return new DummyInfoPacket(buf.readInt(),buf.readInt(),buf.readNbt());

@@ -43,7 +43,7 @@ public class DummyEventUtils {
             //ClientboundSetActionBarTextPacket packet2= new ClientboundSetActionBarTextPacket(finalText);
             //player.connection.send(packet2);
         } else {
-            ((IActionBarDisplay)player).powerfulDummy$sendDamage(0.0, true);
+            //((IActionBarDisplay)player).powerfulDummy$sendDamage(0.0, true);
         }
     }
     public static MutableComponent getInfoComponent(double damage,double dps,double total,int color) {
