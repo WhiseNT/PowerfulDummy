@@ -8,7 +8,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
-@EventBusSubscriber(modid = Powerful_dummy.MODID)
+@EventBusSubscriber(modid = Powerful_dummy.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class NetworkRegistry {
 
     @SubscribeEvent

@@ -23,7 +23,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import java.util.List;
 
 
-@EventBusSubscriber(modid = Powerful_dummy.MODID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Powerful_dummy.MODID,bus = EventBusSubscriber.Bus.GAME)
 public class ForgeEventsHandler {
     @SubscribeEvent
     public static void dataListener(AddReloadListenerEvent event){

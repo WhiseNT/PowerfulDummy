@@ -17,7 +17,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 
-@EventBusSubscriber(modid = Powerful_dummy.MODID)
+@EventBusSubscriber(modid = Powerful_dummy.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class ServerEventsHandler {
 
     private static final int TICK_INTERVAL = 40;

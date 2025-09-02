@@ -92,47 +92,35 @@ public class Powerful_dummy {
                     .build());
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        if (FMLLoader.getDist().isClient()) {
-            event.enqueueWork(() -> {
-                EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY.get(),
-                                TestDummyRenderer::new);
-                /*
-                EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY_UNDEAD.get(),
-                            TestDummyRenderer::new);
-                EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY_ARTHROPOD.get(),
-                                TestDummyRenderer::new);
-                EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY_WATER.get(),
-                                TestDummyRenderer::new);
-                EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY_ILLAGER.get(),
-                        TestDummyRenderer::new);
-
-                 */
-
-
-            });
-        }
+        // 移除原来的实体渲染器注册代码，改为使用EntityRenderersEvent.RegisterRenderers事件注册
     }
 
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         // Do something when the server starts
         LOGGER.info("HELLO from server starting");
     }
 
-    // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @OnlyIn(Dist.CLIENT)
-    @EventBusSubscriber(modid = MODID, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD)
     public static class ClientModEvents {
 
         @SubscribeEvent
         public static void onRegisterMenuScreens(RegisterMenuScreensEvent event) {
             event.register(MenuRegistry.TEST_DUMMY_MENU.get(), TestDummyEntityScreen::new);
         }
+        
         @SubscribeEvent
         public static void onRegisterLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
             event.registerLayerDefinition(TestDummyModel.LAYER_LOCATION, TestDummyModel::createBodyLayer);
         }
+        
+        // 添加实体渲染器注册事件
+        @SubscribeEvent
+        public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
+            event.registerEntityRenderer(DummyEntityRegistry.TEST_DUMMY.get(), TestDummyRenderer::new);
+        }
+        
         public static final KeyMapping CLEAR_DPS_DATA =
                 new KeyMapping("key.powerful_dummy.cleardps",
                         KeyConflictContext.IN_GAME,
