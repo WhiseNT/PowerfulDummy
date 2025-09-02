@@ -1,6 +1,6 @@
 package com.whisent.powerful_dummy.network;
 
-import com.whisent.powerful_dummy.client.DpsActionBar;
+import com.whisent.powerful_dummy.client.overlay.DpsOverlay;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -30,9 +30,9 @@ public record DamageDataPacket(double amount, boolean flag) implements CustomPac
     public static void handleOnClient(final DamageDataPacket packet, final IPayloadContext context) {
         context.enqueueWork(() -> {
             if (packet.flag()) {
-                DpsActionBar.getDamageHistory().clean();
+                DpsOverlay.getDamageHistory().clean();
             } else {
-                DpsActionBar.getDamageHistory().addDamage(packet.amount());
+                DpsOverlay.getDamageHistory().addDamage(packet.amount());
             }
         }).exceptionally(e -> {
             System.err.println("Failed to handle damage data packet: " + e.getMessage());

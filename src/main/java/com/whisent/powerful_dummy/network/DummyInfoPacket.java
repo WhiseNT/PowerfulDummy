@@ -101,7 +101,7 @@ public class DummyInfoPacket implements CustomPacketPayload {
 
             if (entity instanceof TestDummyEntity testDummy && !testDummy.isRemoved()) {
                 // 只更新客户端显示，不调用服务器方法
-                testDummy.setMobType(MobTypeHelper.fromId(this.mobTypeId));
+
 
                 for (String attributeKey : this.map.getAllKeys()) {
                     try {
@@ -112,6 +112,7 @@ public class DummyInfoPacket implements CustomPacketPayload {
                         registry.getHolder(rl).ifPresent(attribute -> {
                             testDummy.getAttribute(attribute).setBaseValue(value);
                         });
+                        testDummy.setMobType(MobTypeHelper.fromId(this.mobTypeId));
                     } catch (Exception e) {
                         //Powerful_dummy.LOGGER.warn("Failed to set attribute {} on client: {}", attributeKey, e.getMessage());
                     }

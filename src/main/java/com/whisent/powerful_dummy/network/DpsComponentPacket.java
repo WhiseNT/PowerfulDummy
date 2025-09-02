@@ -1,7 +1,8 @@
 package com.whisent.powerful_dummy.network;
 
 import com.whisent.powerful_dummy.PowerfulDummyConfig;
-import com.whisent.powerful_dummy.client.DpsActionBar;
+import com.whisent.powerful_dummy.client.overlay.DpsOverlay;
+import com.whisent.powerful_dummy.utils.Debugger;
 import com.whisent.powerful_dummy.utils.DummyEventUtils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -36,7 +37,7 @@ public record DpsComponentPacket(double damage, double dps, double totalDamage, 
     public static void handleOnClient(final DpsComponentPacket packet, final IPayloadContext context) {
         context.enqueueWork(() -> {
             if (!PowerfulDummyConfig.useActionbarToShowData) {
-                DpsActionBar.displayText(packet.damage(), packet.dps(), packet.totalDamage(), packet.combo(), packet.color());
+                DpsOverlay.displayText(packet.damage(), packet.dps(), packet.totalDamage(), packet.combo(), packet.color());
             } else {
                 Minecraft minecraft = Minecraft.getInstance();
                 if (minecraft.player != null) {
@@ -47,7 +48,7 @@ public record DpsComponentPacket(double damage, double dps, double totalDamage, 
                 }
             }
         }).exceptionally(e -> {
-            System.err.println("Failed to handle DPS component packet: " + e.getMessage());
+            Debugger.sendDebugMessage("Failed to handle DPS component packet: " + e.getMessage());
             e.printStackTrace();
             return null;
         });

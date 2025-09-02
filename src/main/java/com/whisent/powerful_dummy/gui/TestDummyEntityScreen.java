@@ -301,17 +301,17 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
         MobTypeHelper.MobTypeEnum initialType = entity.getMobType();
         this.mobType = initialType;
         Button changeTypeButton = Button.builder(
-                        //MobTypeHelper.getDisplayName(initialType)
-                        Component.literal("×"),
+                        MobTypeHelper.getDisplayName(initialType),
+                        //Component.literal("×"),
                         button -> {
-                            /*
+
                             TestDummyEntity target = this.menu.getTargetEntity();
                             if (target == null) return;
                             MobTypeHelper.MobTypeEnum next = MobTypeHelper.getNextMobType(this.mobType);
                             button.setMessage(MobTypeHelper.getDisplayName(next));
                             this.mobType = next;
 
-                             */
+
                         })
                 .pos(Xpos, this.topPos + 30 +36 )
                 .size(40, 20)

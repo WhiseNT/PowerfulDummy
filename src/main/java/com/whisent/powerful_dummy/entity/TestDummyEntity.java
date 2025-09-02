@@ -8,6 +8,7 @@ import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
@@ -107,7 +108,7 @@ public class TestDummyEntity extends Mob {
     private MobTypeHelper.MobTypeEnum initMobType(EntityType<? extends TestDummyEntity> entityType) {
         if (DummyEntityRegistry.TEST_DUMMY.get() == entityType) {
             return MobTypeHelper.MobTypeEnum.UNDEFINED;
-        } /* else if (DummyEntityRegistry.TEST_DUMMY_UNDEAD.get() == entityType) {
+        } else if (DummyEntityRegistry.TEST_DUMMY_UNDEAD.get() == entityType) {
             return MobTypeHelper.MobTypeEnum.UNDEAD;
         } else if (DummyEntityRegistry.TEST_DUMMY_WATER.get() == entityType) {
             return MobTypeHelper.MobTypeEnum.WATER;
@@ -115,7 +116,7 @@ public class TestDummyEntity extends Mob {
             return MobTypeHelper.MobTypeEnum.ARTHROPOD;
         } else if (DummyEntityRegistry.TEST_DUMMY_ILLAGER.get() == entityType) {
             return MobTypeHelper.MobTypeEnum.ILLAGER;
-        } */
+        }
         return MobTypeHelper.MobTypeEnum.UNDEFINED;
     }
     public void popEquipmentSlots () {
@@ -201,20 +202,20 @@ public class TestDummyEntity extends Mob {
     public void setMobType(MobTypeHelper.MobTypeEnum type) {
         if (this.mobType != type) {
             this.mobType = type;
-
-            /*
-            switch (type) {
-                case UNDEFINED -> switchMobType(DummyEntityRegistry.TEST_DUMMY.get());
-                case UNDEAD -> switchMobType(DummyEntityRegistry.TEST_DUMMY_UNDEAD.get());
-                case ILLAGER -> switchMobType(DummyEntityRegistry.TEST_DUMMY_ILLAGER.get());
-                case WATER -> switchMobType(DummyEntityRegistry.TEST_DUMMY_WATER.get());
-                case ARTHROPOD -> switchMobType(DummyEntityRegistry.TEST_DUMMY_ARTHROPOD.get());
+            
+            // 在服务端执行实体类型转换
+            if (!this.level().isClientSide) {
+                switch (type) {
+                    case UNDEFINED -> switchMobType(DummyEntityRegistry.TEST_DUMMY.get());
+                    case UNDEAD -> switchMobType(DummyEntityRegistry.TEST_DUMMY_UNDEAD.get());
+                    case ILLAGER -> switchMobType(DummyEntityRegistry.TEST_DUMMY_ILLAGER.get());
+                    case WATER -> switchMobType(DummyEntityRegistry.TEST_DUMMY_WATER.get());
+                    case ARTHROPOD -> switchMobType(DummyEntityRegistry.TEST_DUMMY_ARTHROPOD.get());
+                }
             }
-
-             */
         }
-
     }
+    
     private void switchMobType(EntityType<? extends TestDummyEntity> type) {
         TestDummyEntity newEntity = new TestDummyEntity(type, this.level());
         newEntity.getAttributes()
@@ -225,6 +226,11 @@ public class TestDummyEntity extends Mob {
         newEntity.lastHurtByPlayer = this.lastHurtByPlayer;
         newEntity.setPos(this.getX(), this.getY(), this.getZ());
         newEntity.setRot(this.getYRot(), this.getXRot());
+        newEntity.setYBodyRot(this.getYRot());
+        newEntity.setYHeadRot(this.getYRot());
+        
+        // 保持mobType设置
+        newEntity.mobType = this.mobType;
 
         CompoundTag nbt  = new CompoundTag();
         this.saveWithoutId(nbt);
@@ -236,7 +242,6 @@ public class TestDummyEntity extends Mob {
             newDummyCurios.setCurios(oldDummyCurios.getCurios());
         }
         this.level().addFreshEntity(newEntity);
-
     }
 
     public void kill() {
@@ -296,27 +301,23 @@ public class TestDummyEntity extends Mob {
     }
 
     @Override
-    public void setYHeadRot(float p_21306_) {
-        super.setYHeadRot(p_21306_);
+    public void setYHeadRot(float headRot) {
+        super.setYHeadRot(headRot);
     }
 
     @Override
-    public void setXRot(float p_146927_) {
-        super.setXRot(p_146927_);
+    public void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        if (tag.contains("MobType")) {
+            this.mobType = MobTypeHelper.MobTypeEnum.valueOf(tag.getString("MobType"));
+        }
     }
 
     @Override
-    public void setYRot(float p_146923_) {
-        super.setYRot(p_146923_);
+    public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        if (this.mobType != null) {
+            tag.putString("MobType", this.mobType.name());
+        }
     }
-
-    @Override
-    public @Nullable LivingEntity getLastHurtByMob() {
-        return super.getLastHurtByMob();
-    }
-
-
-
-
-
 }

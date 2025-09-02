@@ -60,14 +60,14 @@ public class Powerful_dummy {
         DummyEntityRegistry.register(modEventBus);
         modEventBus.addListener(EventPriority.NORMAL, false, EntityAttributeCreationEvent.class, event -> {
             event.put(DummyEntityRegistry.TEST_DUMMY.get(), TestDummyEntity.setAttributes());
-            /*
+
             event.put(DummyEntityRegistry.TEST_DUMMY_UNDEAD.get(), TestDummyEntity.setAttributes());
             event.put(DummyEntityRegistry.TEST_DUMMY_ILLAGER.get(), TestDummyEntity.setAttributes());
             event.put(DummyEntityRegistry.TEST_DUMMY_WATER.get(), TestDummyEntity.setAttributes());
             event.put(DummyEntityRegistry.TEST_DUMMY_ARTHROPOD.get(), TestDummyEntity.setAttributes());
 
 
-             */
+
         });
         modEventBus.addListener(this::onModConfigEvent);
         new DpsActionBar();
@@ -109,18 +109,21 @@ public class Powerful_dummy {
         public static void onRegisterMenuScreens(RegisterMenuScreensEvent event) {
             event.register(MenuRegistry.TEST_DUMMY_MENU.get(), TestDummyEntityScreen::new);
         }
-        
         @SubscribeEvent
         public static void onRegisterLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
             event.registerLayerDefinition(TestDummyModel.LAYER_LOCATION, TestDummyModel::createBodyLayer);
         }
-        
+
         // 添加实体渲染器注册事件
         @SubscribeEvent
         public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
             event.registerEntityRenderer(DummyEntityRegistry.TEST_DUMMY.get(), TestDummyRenderer::new);
+
+            event.registerEntityRenderer(DummyEntityRegistry.TEST_DUMMY_UNDEAD.get(), TestDummyRenderer::new);
+            event.registerEntityRenderer(DummyEntityRegistry.TEST_DUMMY_ILLAGER.get(), TestDummyRenderer::new);
+            event.registerEntityRenderer(DummyEntityRegistry.TEST_DUMMY_WATER.get(), TestDummyRenderer::new);
+            event.registerEntityRenderer(DummyEntityRegistry.TEST_DUMMY_ARTHROPOD.get(), TestDummyRenderer::new);
         }
-        
         public static final KeyMapping CLEAR_DPS_DATA =
                 new KeyMapping("key.powerful_dummy.cleardps",
                         KeyConflictContext.IN_GAME,

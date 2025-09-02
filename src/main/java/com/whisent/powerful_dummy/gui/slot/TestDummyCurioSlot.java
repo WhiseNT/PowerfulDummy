@@ -52,7 +52,7 @@ public class TestDummyCurioSlot extends Slot {
                 }
             }
         }
-        return false;
+        return true;
 
 
     }

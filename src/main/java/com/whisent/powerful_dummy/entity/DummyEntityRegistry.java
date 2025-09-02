@@ -19,7 +19,7 @@ public class DummyEntityRegistry {
             () -> EntityType.Builder.of(TestDummyEntity::new, MobCategory.MISC)
                     .sized(0.6F, 2.7F)
                     .build("test_dummy"));
-    /*
+
     public static final Supplier<EntityType<TestDummyEntity>> TEST_DUMMY_UNDEAD =
             ENTITIES.register("test_dummy_undead",
             () -> EntityType.Builder.of(TestDummyEntity::new, MobCategory.MISC)
@@ -41,7 +41,7 @@ public class DummyEntityRegistry {
                     .sized(0.6F, 2.7F)
                     .build("test_dummy_illager"));
 
-     */
+
     public static void register(IEventBus bus) {
         ENTITIES.register(bus);
     }

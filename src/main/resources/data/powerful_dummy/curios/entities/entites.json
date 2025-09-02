@@ -1,6 +1,10 @@
 {
   "entities": [
-    "powerful_dummy:test_dummy"
+    "powerful_dummy:test_dummy",
+    "powerful_dummy:test_dummy_undead",
+    "powerful_dummy:test_dummy_water",
+    "powerful_dummy:test_dummy_arthropod",
+    "powerful_dummy:test_dummy_illager"
   ],
   "slots": [
     "dummy_curio"
