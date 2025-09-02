@@ -1,0 +1,8 @@
+{
+  "entities": [
+    "powerful_dummy:test_dummy"
+  ],
+  "slots": [
+    "dummy_curio"
+  ]
+}

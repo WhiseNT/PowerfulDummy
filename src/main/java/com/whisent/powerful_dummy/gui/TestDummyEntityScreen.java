@@ -203,7 +203,6 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
         ResourceLocation dataId = new ResourceLocation(Powerful_dummy.MODID, "attribute_display");
         AttributeData data = AttributeLoader.getData(dataId);
         if (data == null) {
-            // 可选：添加日志或调试输出
             return;
         }
         if (entity == null) {
@@ -211,9 +210,9 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
         }
 
         int x = this.leftPos + 95;
-        int y = this.topPos + 24;
-        int offset = 3;
+        int y = this.topPos + 26;
         int lineHeight = this.font.lineHeight;
+        int verticalSpacing = 5; // 行间距
 
         for (AttributeData.AttributeEntry entry : data.attributes) {
             Attribute attribute = entry.getAttribute();
@@ -222,28 +221,28 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
             }
 
             double value = entity.getAttributeValue(attribute);
-            // 可选：对 value 进行有效性检查（如是否为 NaN 或 Infinite）
 
+            // 渲染属性名称
             String attributeText = Component.translatable(attribute.getDescriptionId()).getString();
+            int maxWidth = 100;
+            if (attributeText.length() > maxWidth) {
+                attributeText = font.plainSubstrByWidth(attributeText, maxWidth) + "..";
+            }
+            guiGraphics.drawString(this.font, attributeText, x, y, entry.getDisplayColor(), false);
+
+            // 渲染属性值（在下一行）
             String formattedValue;
             if (entry.usePercent) {
-                formattedValue = String.format("%.2f", value * 100);
+                formattedValue = String.format("%.2f%%", value * 100);
             } else {
                 formattedValue = String.format("%.2f", value);
             }
 
-            // 使用 StringBuilder 避免多次字符串拼接
-            String fullText = new StringBuilder()
-                    .append(attributeText)
-                    .append(": ")
-                    .append(formattedValue)
-                    .toString();
+            int valueColor = entry.getDisplayColor();
+            guiGraphics.drawString(this.font, formattedValue, x, y + lineHeight, valueColor, false);
 
-            guiGraphics.drawString(this.font, fullText, x, y + offset, entry.getDisplayColor(), false);
-
-            // 更新偏移量
-            offset += lineHeight + 5; // 原逻辑中 offset += 1 + 4，加上 lineHeight
-            y += lineHeight * 2;
+            // 更新Y坐标，为下一个属性预留两行空间加上间距
+            y += (lineHeight * 2) + verticalSpacing;
         }
     }
 
