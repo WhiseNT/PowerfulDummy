@@ -115,49 +115,23 @@ public class TestDummyEntityMenu extends AbstractContainerMenu {
             Debugger.sendDebugMessage("[TestDummyEntityMenu] Moving item: " +
                     itemStack.getDisplayName().getString() +
                     " (count: " + itemStack.getCount() + ")");
-            // 1. 从盔甲栏/手持栏转移 (0-5)
+
+            // 根据槽位索引分类处理
             if (index < 6) {
+                // 1. 从盔甲栏/手持栏转移 (0-5)
                 Debugger.sendDebugMessage("[TestDummyEntityMenu] Moving from armor/hand slot");
-
-                // 先尝试饰品栏 (42+)
-                if (!moveItemStackTo(itemStack, 42, slots.size(), false)) {
-                    // 再尝试玩家背包 (6-42)
-                    if (!moveItemStackTo(itemStack, 6, 42, false)) {
-                        return ItemStack.EMPTY;
-                    }
+                if (!moveItemToPlayerInventory(itemStack)) {
+                    return ItemStack.EMPTY;
                 }
-            }
-            // 2. 从玩家背包转移 (6-41)
-            else if (index < 42) {
+            } else if (index < 42) {
+                // 2. 从玩家背包转移 (6-41)
                 Debugger.sendDebugMessage("[TestDummyEntityMenu] Moving from player inventory");
-
-                // 优先级1: 饰品栏 (42+)
-                if (!moveItemStackTo(itemStack, 42, slots.size(), false)) {
-                    // 优先级2: 匹配的盔甲栏 (0-3)
-                    boolean movedToArmor = false;
-                    if (itemStack.getItem() instanceof ArmorItem armorItem) {
-                        for (int i = 0; i < 4; i++) {
-                            if (armorItem.getEquipmentSlot() == getEquipmentSlot(i)) {
-                                if (moveItemStackTo(itemStack, i, i+1, false)) {
-                                    movedToArmor = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    // 优先级3: 手持栏 (4-5) - 最低优先级
-                    if (!movedToArmor && !itemStack.isEmpty()) {
-                        if (!moveItemStackTo(itemStack, 4, 6, false)) {
-                            return ItemStack.EMPTY;
-                        }
-                    }
+                if (!moveItemFromPlayerInventory(itemStack)) {
+                    return ItemStack.EMPTY;
                 }
-            }
-            // 3. 从饰品栏转移 (42+)
-            else {
+            } else {
+                // 3. 从饰品栏转移 (42+)
                 Debugger.sendDebugMessage("[TestDummyEntityMenu] Moving from curios slot");
-
-                // 直接尝试玩家背包 (6-42)
                 if (!moveItemStackTo(itemStack, 6, 42, false)) {
                     return ItemStack.EMPTY;
                 }
@@ -177,6 +151,44 @@ public class TestDummyEntityMenu extends AbstractContainerMenu {
         }
 
         return originalStack;
+    }
+
+    /**
+     * 将物品从盔甲栏/手持栏移动到玩家背包或饰品栏
+     */
+    private boolean moveItemToPlayerInventory(ItemStack itemStack) {
+        // 先尝试饰品栏 (42+)
+        if (!moveItemStackTo(itemStack, 42, slots.size(), false)) {
+            // 再尝试玩家背包 (6-42)
+            return moveItemStackTo(itemStack, 6, 42, false);
+        }
+        return true;
+    }
+
+    /**
+     * 将物品从玩家背包移动到合适的装备槽位
+     */
+    private boolean moveItemFromPlayerInventory(ItemStack itemStack) {
+        // 优先级1: 饰品栏 (42+)
+        if (!moveItemStackTo(itemStack, 42, slots.size(), false)) {
+            // 优先级2: 匹配的盔甲栏 (0-3)
+            boolean movedToArmor = false;
+            if (itemStack.getItem() instanceof ArmorItem armorItem) {
+                for (int i = 0; i < 4; i++) {
+                    if (armorItem.getEquipmentSlot() == getEquipmentSlot(i)) {
+                        if (moveItemStackTo(itemStack, i, i + 1, false)) {
+                            movedToArmor = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            // 优先级3: 手持栏 (4-5) - 最低优先级
+            if (!movedToArmor && !itemStack.isEmpty()) {
+                return moveItemStackTo(itemStack, 4, 6, false);
+            }
+        }
+        return true;
     }
 
 

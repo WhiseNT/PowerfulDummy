@@ -7,8 +7,12 @@ import com.whisent.powerful_dummy.data.AttributeLoader;
 import com.whisent.powerful_dummy.data.tag.DamageTagLoader;
 import com.whisent.powerful_dummy.dps.DamageData;
 import com.whisent.powerful_dummy.dps.DpsTracker;
+import com.whisent.powerful_dummy.impl.DummyCustomJS;
+import com.whisent.powerful_dummy.impl.DummyEvents;
+import com.whisent.powerful_dummy.kjs.DummyCustomizer;
 import com.whisent.powerful_dummy.utils.Debugger;
 import com.whisent.powerful_dummy.utils.TimeUtils;
+import dev.latvian.mods.kubejs.script.ScriptType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -19,6 +23,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 
 import java.util.List;
 
@@ -125,12 +130,16 @@ public class ForgeEventsHandler {
         List<DamageData> subList = list.subList(Math.max(0, list.size() - displayCount), list.size());
 
         subList.forEach(damageData -> {
-            int color = DamageTagLoader.findDisplayColor(damageData.getDamageSource());
+            int color = DummyCustomizer.getDamageTypeColor(damageData.getDamageSource().typeHolder());
+            if (color == 0) {
+                color = DamageTagLoader.findDisplayColor(damageData.getDamageSource());
+            }
             MutableComponent damageComponent = Component.translatable("chat.powerful_dummy.damage")
                     .withStyle(style -> style.withColor(ChatFormatting.WHITE));
 
+            int finalColor = color;
             MutableComponent damageCountComponent = Component.literal(String.format("%.1f", damageData.getAmount()))
-                    .withStyle(style -> style.withColor(color));
+                    .withStyle(style -> style.withColor(finalColor));
 
             MutableComponent dpsComponent = Component.translatable("chat.powerful_dummy.dps")
                     .append(Component.literal(String.format("%.1f", damageData.getCurrentDps()))
@@ -156,6 +165,10 @@ public class ForgeEventsHandler {
             player.sendSystemMessage(Component.translatable("chat.powerful_dummy.damagelog.return",list.size())
                     .withStyle(ChatFormatting.GREEN));
         }
+    }
+    @SubscribeEvent
+    public static void onServerSetup(ServerStartedEvent event) {
+        DummyEvents.CUSTOM.post(ScriptType.SERVER, new DummyCustomJS());
     }
 
 

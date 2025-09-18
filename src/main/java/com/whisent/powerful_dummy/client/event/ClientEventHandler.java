@@ -1,12 +1,16 @@
 package com.whisent.powerful_dummy.client.event;
 
 import com.whisent.powerful_dummy.Powerful_dummy;
+import com.whisent.powerful_dummy.impl.DummyCustomJS;
+import com.whisent.powerful_dummy.impl.DummyEvents;
 import com.whisent.powerful_dummy.network.ClearDpsDataPacket;
+import dev.latvian.mods.kubejs.script.ScriptType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -24,6 +28,7 @@ public class ClientEventHandler {
             }
         }
     }
+
 
 
 }

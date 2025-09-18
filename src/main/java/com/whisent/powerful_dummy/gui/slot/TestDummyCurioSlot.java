@@ -26,7 +26,6 @@ public class TestDummyCurioSlot extends Slot {
     public boolean mayPlace(ItemStack itemStack) {
         if (CuriosApi.getCurio(itemStack).isPresent()) {
             TestDummyCuriosContainer curiosContainer = (TestDummyCuriosContainer) container;
-
             //能否装入空物品槽
             boolean flag = curiosContainer.getCuriosHandlerRaw().getCurios().get(identifier).getStacks().insertItem(
                     curiosContainer.getIdentifierIndex(identifier,slotIndex), itemStack, true
@@ -52,7 +51,7 @@ public class TestDummyCurioSlot extends Slot {
                 }
             }
         }
-        return true;
+        return false;
 
 
     }
