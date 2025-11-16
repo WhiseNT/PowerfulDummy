@@ -149,10 +149,11 @@ dependencies {
     // We add the full version to localRuntime, not runtimeOnly, so that we do not publish a dependency on it
     // localRuntime "mezz.jei:jei-${mc_version}-neoforge:${jei_version}"
     compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}:api"
-    runtimeOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}"
+    //runtimeOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}"
 
-    implementation "curse.maven:kubejs-238086:5810100"
-    implementation "curse.maven:rhino-416294:6886923"
+    compileOnly "curse.maven:kubejs-238086:5810100"
+    compileOnly "curse.maven:rhino-416294:6886923"
+    compileOnly "curse.maven:probejs-585406:5820894"
     //implementation("dev.latvian.mods:kubejs-neoforge:$kubejs_version")
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar

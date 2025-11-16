@@ -4,7 +4,6 @@ import com.whisent.powerful_dummy.data.tag.DamageTagLoader;
 import com.whisent.powerful_dummy.dps.DpsData;
 import com.whisent.powerful_dummy.dps.DpsTracker;
 import com.whisent.powerful_dummy.impl.IActionBarDisplay;
-import com.whisent.powerful_dummy.kjs.DummyCustomizer;
 import com.whisent.powerful_dummy.network.DpsComponentPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -28,14 +27,9 @@ public class DummyEventUtils {
         float totalDamage = DpsTracker.getDpsData(player).getTotalDamage();
         if (!DpsTracker.getDpsData(player).needsReset() && totalDamage > 0.0f) {
             DpsData data = DpsTracker.getDpsData(player);
-            int color = DummyCustomizer.getDamageTypeColor(data.getDamageSource().typeHolder());
-            System.out.println("颜色");
-            System.out.println(DummyCustomizer.getDamageTypeColorMap());
             System.out.println(data.getDamageSource().typeHolder().getKey().location());
-            System.out.println(color);
-            if (color == 0) {
-                color = DamageTagLoader.findDisplayColor(data.getDamageSource());
-            }
+            int color = 0;
+            color = DamageTagLoader.findDisplayColor(data.getDamageSource());
             float damage = data.getLastDamage();
             float dps = DpsTracker.getDps(player);
             float total = data.getTotalDamage();

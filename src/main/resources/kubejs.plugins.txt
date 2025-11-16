@@ -1,1 +1,0 @@
-com.whisent.powerful_dummy.PowerfulDummyPlugin

@@ -17,10 +17,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -54,11 +51,14 @@ public class TestDummyEntity extends Mob {
         this.setInvulnerable(false);
         this.setPersistenceRequired();
         this.mobType = initMobType(entityType);
-        CuriosApi.getCuriosInventory(this).ifPresent(curiosInventory -> {
-            curiosInventory.addTransientSlotModifier("curio",
-                    ResourceLocation.fromNamespaceAndPath("powerful_dummy", "modifier"),
-                    9, AttributeModifier.Operation.ADD_VALUE);
-        });
+        if (ModList.get().isLoaded( "curios")){
+            CuriosApi.getCuriosInventory(this).ifPresent(curiosInventory -> {
+                curiosInventory.addTransientSlotModifier("curio",
+                        ResourceLocation.fromNamespaceAndPath("powerful_dummy", "modifier"),
+                        9, AttributeModifier.Operation.ADD_VALUE);
+            });
+        }
+
         if (!this.level().isClientSide) {
             Debugger.sendDebugMessage("[TestDummyEntity] Created new dummy at position: " + blockPosition());
         }
@@ -188,10 +188,22 @@ public class TestDummyEntity extends Mob {
     }
 
     @Override
+    public void move(MoverType type, Vec3 pos) {
+        if (pos.x == 0 && pos.z == 0) {
+            super.move(type, pos);
+        }
+    }
+
+    @Override
     protected void actuallyHurt(@NotNull DamageSource source, float damage) {
         super.actuallyHurt(source, damage);
 
 
+    }
+
+    @Override
+    public void travel(Vec3 travelVector) {
+        super.travel(travelVector.multiply(0.0D, 1.0D, 0.0D));
     }
 
 

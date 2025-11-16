@@ -38,6 +38,7 @@ public class TestDummyCuriosContainer extends SimpleContainer {
                 slotIndexToIdentifierIndexMap.put(index, i);
                 index++;
             }
+
         }
 
         var inv = entity.getCapability(CuriosCapability.INVENTORY);

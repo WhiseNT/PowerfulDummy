@@ -23,6 +23,11 @@ public class DpsActionBar {
     private static final int FADE_TICKS = 10;
     private static final int STAY_TICKS = 30;
     private static final int MAX_VISIBLE_TICKS = FADE_TICKS + STAY_TICKS + FADE_TICKS;
+    
+    public DpsActionBar() {
+        // 构造函数保持空实现
+    }
+    
     public static void displayText(double damage, double dps, double totalDamage, int combo, int color) {
         currentData.set(new ClientDummyData(damage, dps, totalDamage, combo, color));
         ticksVisible = 0;

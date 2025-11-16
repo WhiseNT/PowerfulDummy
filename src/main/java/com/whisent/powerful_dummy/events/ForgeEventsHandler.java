@@ -7,12 +7,8 @@ import com.whisent.powerful_dummy.data.AttributeLoader;
 import com.whisent.powerful_dummy.data.tag.DamageTagLoader;
 import com.whisent.powerful_dummy.dps.DamageData;
 import com.whisent.powerful_dummy.dps.DpsTracker;
-import com.whisent.powerful_dummy.impl.DummyCustomJS;
-import com.whisent.powerful_dummy.impl.DummyEvents;
-import com.whisent.powerful_dummy.kjs.DummyCustomizer;
 import com.whisent.powerful_dummy.utils.Debugger;
 import com.whisent.powerful_dummy.utils.TimeUtils;
-import dev.latvian.mods.kubejs.script.ScriptType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -45,7 +41,7 @@ public class ForgeEventsHandler {
                         .executes(context -> { // 不带参数的 get
                             ServerPlayer player = context.getSource().getPlayerOrException();
                             List<DamageData> list = DpsTracker.getDpsData(player).getDamageDataList();
-                            int maxEntries = 20; // 默认显示20条
+                            int maxEntries = 20;
                             displayDamageLog(player, list, maxEntries);
                             return 1;
                         })
@@ -130,10 +126,8 @@ public class ForgeEventsHandler {
         List<DamageData> subList = list.subList(Math.max(0, list.size() - displayCount), list.size());
 
         subList.forEach(damageData -> {
-            int color = DummyCustomizer.getDamageTypeColor(damageData.getDamageSource().typeHolder());
-            if (color == 0) {
-                color = DamageTagLoader.findDisplayColor(damageData.getDamageSource());
-            }
+            int color = 0;
+            color = DamageTagLoader.findDisplayColor(damageData.getDamageSource());
             MutableComponent damageComponent = Component.translatable("chat.powerful_dummy.damage")
                     .withStyle(style -> style.withColor(ChatFormatting.WHITE));
 
@@ -168,7 +162,7 @@ public class ForgeEventsHandler {
     }
     @SubscribeEvent
     public static void onServerSetup(ServerStartedEvent event) {
-        DummyEvents.CUSTOM.post(ScriptType.SERVER, new DummyCustomJS());
+        // 移除了 KubeJS 相关的事件调用
     }
 
 

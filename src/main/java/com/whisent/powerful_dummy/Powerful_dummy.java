@@ -9,10 +9,7 @@ import com.whisent.powerful_dummy.entity.client.TestDummyModel;
 import com.whisent.powerful_dummy.entity.client.TestDummyRenderer;
 import com.whisent.powerful_dummy.gui.MenuRegistry;
 import com.whisent.powerful_dummy.gui.TestDummyEntityScreen;
-import com.whisent.powerful_dummy.impl.DummyCustomJS;
-import com.whisent.powerful_dummy.impl.DummyEvents;
 import com.whisent.powerful_dummy.item.ItemRegistry;
-import dev.latvian.mods.kubejs.script.ScriptType;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.core.registries.Registries;
@@ -29,7 +26,6 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
@@ -110,7 +106,6 @@ public class Powerful_dummy {
         @SubscribeEvent
 
         public static void onClientSetup(FMLCommonSetupEvent event) {
-            DummyEvents.CUSTOM.post(ScriptType.CLIENT, new DummyCustomJS());
         }
 
         @SubscribeEvent

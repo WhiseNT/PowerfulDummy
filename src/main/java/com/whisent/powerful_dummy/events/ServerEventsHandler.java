@@ -65,7 +65,6 @@ public class ServerEventsHandler {
 
                 Debugger.sendDebugMessage(String.format("[TestDummyEntity] Actually hurt by: %s | Damage: %f | Source: %s",
                         damageSourceMsgId, damage, entityName));
-
                 Player player = null;
                 if (entity instanceof Player) {
                     player = (Player) entity;
