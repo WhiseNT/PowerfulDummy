@@ -19,36 +19,26 @@ public class NetworkRegistry {
         registrar.playToClient(
                 DpsComponentPacket.TYPE,
                 DpsComponentPacket.STREAM_CODEC,
-                new DirectionalPayloadHandler<>(
-                        DpsComponentPacket::handleOnClient,
-                        null
-                )
+                DpsComponentPacket::handleOnClient
         );
 
         // 注册 DamageDataPacket（服务器 -> 客户端）
         registrar.playToClient(
                 DamageDataPacket.TYPE,
                 DamageDataPacket.STREAM_CODEC,
-                new DirectionalPayloadHandler<>(
-                        DamageDataPacket::handleOnClient,
-                        null
-                )
+                DamageDataPacket::handleOnClient
         );
+        
         registrar.playBidirectional(
                 DummyInfoPacket.TYPE,
                 DummyInfoPacket.STREAM_CODEC,
-                new DirectionalPayloadHandler<>(
-                        DummyInfoPacket::handle,
-                        DummyInfoPacket::handle
-                )
+                DummyInfoPacket::handle
         );
+        
         registrar.playToServer(
                 ClearDpsDataPacket.TYPE,
                 ClearDpsDataPacket.STREAM_CODEC,
-                new DirectionalPayloadHandler<>(
-                        ClearDpsDataPacket::handle,
-                        ClearDpsDataPacket::handle
-                )
+                ClearDpsDataPacket::handle
         );
     }
 }

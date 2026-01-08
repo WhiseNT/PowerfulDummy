@@ -3,6 +3,7 @@ package com.whisent.powerful_dummy;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.logging.LogUtils;
 import com.whisent.powerful_dummy.client.DpsActionBar;
+import com.whisent.powerful_dummy.client.event.ClientEventHandler;
 import com.whisent.powerful_dummy.entity.DummyEntityRegistry;
 import com.whisent.powerful_dummy.entity.TestDummyEntity;
 import com.whisent.powerful_dummy.entity.client.TestDummyModel;
@@ -49,7 +50,6 @@ public class Powerful_dummy {
     public Powerful_dummy(IEventBus modEventBus) {
 
 
-        modEventBus.addListener(this::commonSetup);
 
         ItemRegistry.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
@@ -69,7 +69,7 @@ public class Powerful_dummy {
 
         });
         modEventBus.addListener(this::onModConfigEvent);
-        new DpsActionBar();
+
         PowerfulDummyConfig.register();
 
     }
@@ -90,9 +90,6 @@ public class Powerful_dummy {
                     })
                     .build());
 
-    private void commonSetup(final FMLCommonSetupEvent event) {
-
-    }
 
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
@@ -100,12 +97,18 @@ public class Powerful_dummy {
         LOGGER.info("HELLO from server starting");
     }
 
-    @OnlyIn(Dist.CLIENT)
-    @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents {
         @SubscribeEvent
-
         public static void onClientSetup(FMLCommonSetupEvent event) {
+            event.enqueueWork(() -> {
+                new DpsActionBar();
+//                EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY.get(), TestDummyRenderer::new);
+//                EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY_UNDEAD.get(), TestDummyRenderer::new);
+//                EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY_ILLAGER.get(), TestDummyRenderer::new);
+//                EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY_WATER.get(), TestDummyRenderer::new);
+//                EntityRenderers.register(DummyEntityRegistry.TEST_DUMMY_ARTHROPOD.get(), TestDummyRenderer::new);
+            });
         }
 
         @SubscribeEvent

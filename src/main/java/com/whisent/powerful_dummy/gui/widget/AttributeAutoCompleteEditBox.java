@@ -11,11 +11,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.HashMap;
 import java.util.List;
 
-
+@OnlyIn(Dist.CLIENT)
 public class AttributeAutoCompleteEditBox extends AbstractAutoCompleteEditBox {
     public LivingEntity entity;
     public final HashMap<String,Boolean> attributesNotZero;

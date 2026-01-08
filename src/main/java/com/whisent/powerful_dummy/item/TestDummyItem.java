@@ -21,7 +21,7 @@ import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
 import java.util.Map;
 
-public class TestDummyItem extends Item {
+public class TestDummyItem extends Item{
     public TestDummyItem(Properties p_41383_) {
         super(p_41383_);
     }

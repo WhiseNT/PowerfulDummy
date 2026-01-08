@@ -2,9 +2,7 @@ package com.whisent.powerful_dummy.network;
 
 import com.whisent.powerful_dummy.Powerful_dummy;
 import com.whisent.powerful_dummy.entity.TestDummyEntity;
-import com.whisent.powerful_dummy.utils.Debugger;
 import com.whisent.powerful_dummy.utils.MobTypeHelper;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -14,6 +12,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
@@ -93,28 +93,36 @@ public class DummyInfoPacket implements CustomPacketPayload {
     }
 
     private void handleOnClient() {
-        Minecraft mc = Minecraft.getInstance();
-        Level world = mc.level;
+        if (net.neoforged.fml.loading.FMLEnvironment.dist.isClient()) {
+            ClientHandler.handle(this);
+        }
+    }
 
-        if (world != null) {
-            Entity entity = world.getEntity(this.id);
+    @OnlyIn(Dist.CLIENT)
+    private static class ClientHandler {
+        static void handle(DummyInfoPacket packet) {
+            net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+            Level world = mc.level;
 
-            if (entity instanceof TestDummyEntity testDummy && !testDummy.isRemoved()) {
-                // 只更新客户端显示，不调用服务器方法
+            if (world != null) {
+                Entity entity = world.getEntity(packet.id);
 
+                if (entity instanceof TestDummyEntity testDummy && !testDummy.isRemoved()) {
+                    // 只更新客户端显示，不调用服务器方法
 
-                for (String attributeKey : this.map.getAllKeys()) {
-                    try {
-                        ResourceLocation rl = ResourceLocation.parse(attributeKey);
-                        double value = this.map.getDouble(attributeKey);
+                    for (String attributeKey : packet.map.getAllKeys()) {
+                        try {
+                            ResourceLocation rl = ResourceLocation.parse(attributeKey);
+                            double value = packet.map.getDouble(attributeKey);
 
-                        var registry = testDummy.level().registryAccess().registryOrThrow(Registries.ATTRIBUTE);
-                        registry.getHolder(rl).ifPresent(attribute -> {
-                            testDummy.getAttribute(attribute).setBaseValue(value);
-                        });
-                        testDummy.setMobType(MobTypeHelper.fromId(this.mobTypeId));
-                    } catch (Exception e) {
-                        //Powerful_dummy.LOGGER.warn("Failed to set attribute {} on client: {}", attributeKey, e.getMessage());
+                            var registry = testDummy.level().registryAccess().registryOrThrow(Registries.ATTRIBUTE);
+                            registry.getHolder(rl).ifPresent(attribute -> {
+                                testDummy.getAttribute(attribute).setBaseValue(value);
+                            });
+                            testDummy.setMobType(MobTypeHelper.fromId(packet.mobTypeId));
+                        } catch (Exception e) {
+                            //Powerful_dummy.LOGGER.warn("Failed to set attribute {} on client: {}", attributeKey, e.getMessage());
+                        }
                     }
                 }
             }

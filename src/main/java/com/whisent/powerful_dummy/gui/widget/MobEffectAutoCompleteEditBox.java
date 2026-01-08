@@ -9,9 +9,12 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.List;
 
+@OnlyIn(Dist.CLIENT)
 public class MobEffectAutoCompleteEditBox extends AbstractAutoCompleteEditBox{
     public MobEffectAutoCompleteEditBox(Font font, int x, int y, int width, int height, Component message) {
         super(font, x, y, width, height, message);
