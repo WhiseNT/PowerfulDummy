@@ -8,6 +8,7 @@ import com.whisent.powerful_dummy.utils.Debugger;
 import com.whisent.powerful_dummy.utils.DummyEventUtils;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -37,6 +38,7 @@ import top.theillusivec4.curios.api.CuriosCapability;
 public class TestDummyEntity extends Mob {
     public MobType mobType;
     public Player lastInteractPlayer;
+    public int healMode = HealModeMagicNumber.INTERVAL;
 
     private final SimpleContainer inventory = new SimpleContainer(4);
     public TestDummyEntity(EntityType<? extends TestDummyEntity> entityType, Level level) {
@@ -71,6 +73,7 @@ public class TestDummyEntity extends Mob {
                     " at position: " + pos + " with hand: " + hand.name());
         }
         if (player.isCrouching() && player.getMainHandItem().isEmpty()) {
+            if (this == null) return InteractionResult.FAIL;
             if (!player.isCreative()){
                 Block.popResource(player.level(),this.blockPosition(), new ItemStack(ItemRegistry.DUMMY_STAND.get()));
             }
@@ -80,23 +83,24 @@ public class TestDummyEntity extends Mob {
             this.showBreakingParticles();
             return InteractionResult.SUCCESS;
         } else {
-            if (!player.level().isClientSide() && hand == InteractionHand.MAIN_HAND ) {
-                Debugger.sendDebugMessage("[TestDummyEntity] Opening menu for player: " + player.getName().getString());
-                lastInteractPlayer = player;
-                if (player.getMainHandItem().isEmpty()) {
-                    NetworkHooks.openScreen((ServerPlayer)player, new SimpleMenuProvider(
-                            (id,inventory,p)->new TestDummyEntityMenu(id,inventory,this),
-                            Component.translatable("gui.test.title")
-                    ),friendlyByteBuf -> {
-                        friendlyByteBuf.writeInt(this.getId());
-                    });
-                    return InteractionResult.SUCCESS;
-                } else {
-                    Debugger.sendDebugMessage("[TestDummyEntity] Player holding item: " +
-                            player.getMainHandItem().getDisplayName().getString());
+                if (!player.level().isClientSide() && hand == InteractionHand.MAIN_HAND ) {
+                    if (this == null) return InteractionResult.FAIL;
+                    Debugger.sendDebugMessage("[TestDummyEntity] Opening menu for player: " + player.getName().getString());
+                    lastInteractPlayer = player;
+                    if (player.getMainHandItem().isEmpty()) {
+                        NetworkHooks.openScreen((ServerPlayer)player, new SimpleMenuProvider(
+                                (id,inventory,p)->new TestDummyEntityMenu(id,inventory,this),
+                                Component.translatable("gui.test.title")
+                        ),friendlyByteBuf -> {
+                            friendlyByteBuf.writeInt(this.getId());
+                        });
+                        return InteractionResult.SUCCESS;
+                    } else {
+                        Debugger.sendDebugMessage("[TestDummyEntity] Player holding item: " +
+                                player.getMainHandItem().getDisplayName().getString());
+                    }
                 }
             }
-        }
 
         return super.interactAt(player, pos, hand);
     }
@@ -164,8 +168,11 @@ public class TestDummyEntity extends Mob {
     @Override
     protected void actuallyHurt(@NotNull DamageSource source, float damage) {
         super.actuallyHurt(source, damage);
-
-
+        if (this.healMode == HealModeMagicNumber.AFTER_HURT) {
+            if (this.getHealth() < this.getMaxHealth()) {
+                this.heal(this.getMaxHealth() - this.getHealth());
+            }
+        }
     }
 
 
@@ -202,17 +209,42 @@ public class TestDummyEntity extends Mob {
     }
 
 
+    int tickcounter = 0;
     @Override
     public void tick() {
         super.tick();
-        if (this.getHealth() < this.getMaxHealth()) {
-            this.heal(this.getMaxHealth() - this.getHealth()); // 仅在需要时恢复
+        tickcounter++;
+        if (this.healMode == HealModeMagicNumber.INTERVAL) {
+            if (tickcounter % 60 == 0) {
+                tickcounter = 0;
+                if (this.getHealth() < this.getMaxHealth()) {
+                    this.heal(this.getMaxHealth() - this.getHealth());
+                }
+            }
+
+        } else if (this.healMode == HealModeMagicNumber.LOW_HP) {
+            if (this.getHealth() < this.getMaxHealth() * 0.1) {
+                this.heal(this.getMaxHealth());
+            }
         }
+
+
     }
 
     @Override
     public boolean shouldBeSaved() {
         return true;
+    }
+
+    @Override
+    public void travel(Vec3 travelVector) {
+        super.travel(travelVector.multiply(0.0D, 1.0D, 0.0D));
+    }
+    @Override
+    public void move(MoverType type, Vec3 pos) {
+        if (pos.x == 0 && pos.z == 0) {
+            super.move(type, pos);
+        }
     }
     @Override
     public boolean removeWhenFarAway(double distanceToClosestPlayer) {
@@ -242,6 +274,14 @@ public class TestDummyEntity extends Mob {
         super.setYHeadRot(p_21306_);
     }
 
+    public int getHealMode() {
+        return healMode;
+    }
+
+    public void setHealMode(int healMode) {
+        this.healMode = healMode;
+    }
+
     @Override
     public void setXRot(float p_146927_) {
         super.setXRot(p_146927_);
@@ -255,5 +295,19 @@ public class TestDummyEntity extends Mob {
     @Override
     public @Nullable LivingEntity getLastHurtByMob() {
         return super.getLastHurtByMob();
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        if (tag.contains("HealMode")) {
+            this.healMode = tag.getInt("HealMode");
+        }
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        tag.putInt("HealMode", this.healMode);
     }
 }

@@ -38,6 +38,11 @@
 
   "gui.powerful_dummy.stats.dps": "DPS",
   "gui.powerful_dummy.stats.total_damage": "Total Damage",
-  "gui.powerful_dummy.stats.damage_per_hit": "Damage"
+  "gui.powerful_dummy.stats.damage_per_hit": "Damage",
+
+  "heal_mode.powerful_dummy.after_hurt": "After Hurt",
+  "heal_mode.powerful_dummy.interval": "Interval",
+  "heal_mode.powerful_dummy.low_hp": "Low HP",
+  "heal_mode.powerful_dummy.none": "No"
 
 }

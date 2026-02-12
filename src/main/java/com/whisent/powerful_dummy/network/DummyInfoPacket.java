@@ -1,5 +1,6 @@
 package com.whisent.powerful_dummy.network;
 
+import com.whisent.powerful_dummy.entity.HealModeMagicNumber;
 import com.whisent.powerful_dummy.entity.TestDummyEntity;
 import com.whisent.powerful_dummy.utils.MobTypeHelper;
 import net.minecraft.client.Minecraft;
@@ -22,16 +23,19 @@ public class DummyInfoPacket {
     private int id;
     private int mobTypeId;
     private CompoundTag map;
+    private CompoundTag otherData;
 
-    public DummyInfoPacket(int id, int mobTypeId,CompoundTag attributesMap) {
+    public DummyInfoPacket(int id, int mobTypeId, CompoundTag attributesMap, CompoundTag otherData) {
         this.id = id;
         this.mobTypeId = mobTypeId;
         this.map = attributesMap;
+        this.otherData = otherData;
     }
     public void encode(FriendlyByteBuf buf) {
         buf.writeInt(id);
         buf.writeInt(mobTypeId);
         buf.writeNbt(map);
+        buf.writeNbt(otherData);
     }
 
     public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
@@ -44,6 +48,12 @@ public class DummyInfoPacket {
                 Entity entity = world.getEntity(this.id);
                 if (entity != null && entity instanceof TestDummyEntity testDummy && !testDummy.isRemoved()) {
                     testDummy.setMobType(MobTypeHelper.fromId(this.mobTypeId));
+                    
+                    // 处理healMode
+                    if (this.otherData != null && this.otherData.contains("healMode")) {
+                        testDummy.setHealMode(this.otherData.getInt("healMode"));
+                    }
+                    
                     CompoundTag attributesMapBack = new CompoundTag();
                     for (String attributeKey : this.map.getAllKeys()) {
 
@@ -57,7 +67,8 @@ public class DummyInfoPacket {
                     NetWorkHandler.sendToAllClient(new DummyInfoPacket(
                             testDummy.getId(),
                             MobTypeHelper.toId(testDummy.getMobType()),
-                            map
+                            map,
+                            otherData
                     ));
                 }
             } else {
@@ -76,6 +87,12 @@ public class DummyInfoPacket {
                     Entity entity = world.getEntity(this.id);
                     if (entity != null && entity instanceof TestDummyEntity testDummy && !testDummy.isRemoved()) {
                         testDummy.setMobType(MobTypeHelper.fromId(this.mobTypeId));
+                        
+                        // 处理healMode
+                        if (this.otherData != null && this.otherData.contains("healMode")) {
+                            testDummy.setHealMode(this.otherData.getInt("healMode"));
+                        }
+                        
                         for (String attributeKey : this.map.getAllKeys()) {
                             ResourceLocation rl = new ResourceLocation(attributeKey);
                             double value = this.map.getDouble(attributeKey);
@@ -89,6 +106,6 @@ public class DummyInfoPacket {
         });
     }
     public static DummyInfoPacket decode(FriendlyByteBuf buf) {
-        return new DummyInfoPacket(buf.readInt(),buf.readInt(),buf.readNbt());
+        return new DummyInfoPacket(buf.readInt(), buf.readInt(), buf.readNbt(), buf.readNbt());
     }
 }
