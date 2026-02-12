@@ -38,5 +38,10 @@
 
   "gui.powerful_dummy.stats.dps": "秒伤",
   "gui.powerful_dummy.stats.total_damage": "总伤",
-  "gui.powerful_dummy.stats.damage_per_hit": "单次伤害"
+  "gui.powerful_dummy.stats.damage_per_hit": "单次伤害",
+
+  "heal_mode.powerful_dummy.after_hurt": "受伤后",
+  "heal_mode.powerful_dummy.interval": "间隔",
+  "heal_mode.powerful_dummy.low_hp": "低血量",
+  "heal_mode.powerful_dummy.none": "无"
 }

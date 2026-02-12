@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.whisent.powerful_dummy.Powerful_dummy;
 import com.whisent.powerful_dummy.data.AttributeData;
 import com.whisent.powerful_dummy.data.AttributeLoader;
+import com.whisent.powerful_dummy.entity.HealModeMagicNumber;
 import com.whisent.powerful_dummy.entity.TestDummyEntity;
 import com.whisent.powerful_dummy.gui.widget.AttributeAutoCompleteEditBox;
 import com.whisent.powerful_dummy.gui.widget.CustomFocusButton;
@@ -41,10 +42,12 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
     private static final ResourceLocation CURIOS_TEX =
             ResourceLocation.fromNamespaceAndPath(Powerful_dummy.MODID, "textures/gui/test_dummy_curios.png");
     private MobTypeHelper.MobTypeEnum mobType;
+    private int healMode;
     private AttributeAutoCompleteEditBox attributeAutoCompleteBox;
     private CustomFocusButton applyAttributeButton;
     private EditBox attributeInputField;
     private final CompoundTag attributesMap = new CompoundTag();
+    private final CompoundTag otherData = new CompoundTag();
     public TestDummyEntityScreen(TestDummyEntityMenu menu, Inventory inventory,Component title) {
         super(menu, inventory, Component.literal("测试"));
         this.imageWidth = 200; // GUI宽度
@@ -325,6 +328,25 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
                 .size(73, 16)
                 .build();
         addRenderableWidget(applyAttributeButton);
+        healMode = entity.getHealMode();
+        Button healButton = Button.builder(
+                        HealModeMagicNumber.getDisplayName(healMode),
+                        button -> {
+                            TestDummyEntity target = this.menu.getTargetEntity();
+                            if (target == null) return;
+                            if (healMode == HealModeMagicNumber.LOW_HP) {
+                                healMode = HealModeMagicNumber.AFTER_HURT;
+                            } else {
+                                healMode += 1;
+                            }
+                            entity.setHealMode(healMode);
+                            otherData.putInt("healMode", healMode);
+                            button.setMessage(HealModeMagicNumber.getDisplayName(healMode));
+                        })
+                .pos(Xpos + 115, this.topPos + 8)
+                .size(42, 16)
+                .build();
+        addRenderableWidget(healButton);
     }
 
 
@@ -384,10 +406,9 @@ public class TestDummyEntityScreen extends AbstractContainerScreen<TestDummyEnti
         PacketDistributor.sendToServer(new DummyInfoPacket(
                 this.menu.getTargetEntity().getId(),
                 MobTypeHelper.toId(this.mobType),
-                attributesMap
+                attributesMap,
+                otherData
         ));
     }
 
 }
-
-

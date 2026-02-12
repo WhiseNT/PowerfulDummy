@@ -27,21 +27,26 @@ public class DummyInfoPacket implements CustomPacketPayload {
     private final int id;
     private final int mobTypeId;
     private final CompoundTag map;
+    private final CompoundTag otherData;
 
-    public DummyInfoPacket(int id, int mobTypeId, CompoundTag attributesMap) {
+    public DummyInfoPacket(int id, int mobTypeId, CompoundTag attributesMap, CompoundTag otherData) {
         this.id = id;
         this.mobTypeId = mobTypeId;
         this.map = attributesMap;
+        this.otherData = otherData;
+
     }
 
     public static void encode(FriendlyByteBuf buf, DummyInfoPacket packet) {
         buf.writeInt(packet.id);
         buf.writeInt(packet.mobTypeId);
         buf.writeNbt(packet.map);
+        buf.writeNbt(packet.otherData);
+
     }
 
     public static DummyInfoPacket decode(FriendlyByteBuf buf) {
-        return new DummyInfoPacket(buf.readInt(), buf.readInt(), buf.readNbt());
+        return new DummyInfoPacket(buf.readInt(), buf.readInt(), buf.readNbt(), buf.readNbt());
     }
 
     public void handle(IPayloadContext context) {
@@ -83,11 +88,12 @@ public class DummyInfoPacket implements CustomPacketPayload {
                 }
             }
             testDummy.setMobType(MobTypeHelper.fromId(this.mobTypeId));
-
+            testDummy.setHealMode(this.otherData.getInt("healMode"));
             PacketDistributor.sendToAllPlayers(new DummyInfoPacket(
                     testDummy.getId(),
                     MobTypeHelper.toId(testDummy.getMobType()),
-                    this.map
+                    this.map,
+                    this.otherData
             ));
         }
     }
@@ -120,6 +126,7 @@ public class DummyInfoPacket implements CustomPacketPayload {
                                 testDummy.getAttribute(attribute).setBaseValue(value);
                             });
                             testDummy.setMobType(MobTypeHelper.fromId(packet.mobTypeId));
+                            testDummy.setHealMode(packet.otherData.getInt("healMode"));
                         } catch (Exception e) {
                             //Powerful_dummy.LOGGER.warn("Failed to set attribute {} on client: {}", attributeKey, e.getMessage());
                         }
